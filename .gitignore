@@ -1,0 +1,14 @@
+node_modules
+dist
+coverage
+*.log
+.DS_Store
+
+# env ფაილები (მაგალითი: .env.example)
+.env
+.env.*
+!.env.example
+
+# Prisma-ს გენერირებული client (იქმნება `pnpm install`-ისას)
+/src/generated/prisma
+*.tsbuildinfo

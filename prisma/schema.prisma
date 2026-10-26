@@ -1,0 +1,264 @@
+// icomers — მაღაზიის ბაზა
+// წესები: ცხრილები და ველები snake_case; თანხა მთელ რიცხვად, თეთრებში (*_minor);
+// დრო timestamptz (UTC). დეტალურად: docs/04-data-model.md (დოკუმენტაციის რეპო).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// კატალოგი
+// ---------------------------------------------------------------------------
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+
+  @@map("product_status")
+}
+
+model Category {
+  id         String   @id @default(uuid()) @db.Uuid
+  parent_id  String?  @db.Uuid
+  slug       String   @unique
+  sort_order Int      @default(0)
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @updatedAt @db.Timestamptz
+
+  parent       Category?             @relation("CategoryTree", fields: [parent_id], references: [id], onDelete: Restrict)
+  children     Category[]            @relation("CategoryTree")
+  translations CategoryTranslation[]
+  products     Product[]
+
+  @@index([parent_id])
+  @@map("categories")
+}
+
+model CategoryTranslation {
+  category_id     String  @db.Uuid
+  locale          String  @db.VarChar(5)
+  name            String
+  description     String?
+  seo_title       String?
+  seo_description String?
+
+  category Category @relation(fields: [category_id], references: [id], onDelete: Cascade)
+
+  @@id([category_id, locale])
+  @@map("category_translations")
+}
+
+model Product {
+  id                     String        @id @default(uuid()) @db.Uuid
+  sku                    String        @unique
+  slug                   String        @unique
+  category_id            String        @db.Uuid
+  status                 ProductStatus @default(DRAFT)
+  /// ფასი თეთრებში, დღგ-ის ჩათვლით
+  price_minor            Int
+  /// „ძველი ფასი“ (გადახაზული), თეთრებში
+  compare_at_price_minor Int?
+  /// დღგ basis points-ში: 1800 = 18.00%
+  vat_rate_bp            Int           @default(1800)
+  /// ქარხნული (OEM) ნომრები, ძებნისთვის
+  oem_part_numbers       String[]      @default([])
+  /// ტექნიკური მახასიათებლები: { "connector": "Type 2", "current_a": 32, ... }
+  attributes             Json          @default("{}")
+  /// ერგება ყველა დამტენის მოდელს
+  is_universal           Boolean       @default(false)
+  is_featured            Boolean       @default(false)
+  weight_g               Int?
+  created_at             DateTime      @default(now()) @db.Timestamptz
+  updated_at             DateTime      @updatedAt @db.Timestamptz
+
+  category      Category               @relation(fields: [category_id], references: [id], onDelete: Restrict)
+  translations  ProductTranslation[]
+  images        ProductImage[]
+  compatibility ProductCompatibility[]
+  inventory     InventoryItem?
+  movements     StockMovement[]
+  reservations  StockReservation[]
+
+  @@index([category_id, status])
+  @@map("products")
+}
+
+model ProductTranslation {
+  product_id        String  @db.Uuid
+  locale            String  @db.VarChar(5)
+  name              String
+  short_description String?
+  description       String?
+  seo_title         String?
+  seo_description   String?
+
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@id([product_id, locale])
+  @@map("product_translations")
+}
+
+model ProductImage {
+  id          String   @id @default(uuid()) @db.Uuid
+  product_id  String   @db.Uuid
+  storage_key String
+  /// alt ტექსტი ორივე ენაზე: { "ka": "...", "en": "..." }
+  alt         Json     @default("{}")
+  sort_order  Int      @default(0)
+  width       Int?
+  height      Int?
+  created_at  DateTime @default(now()) @db.Timestamptz
+
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@index([product_id, sort_order])
+  @@map("product_images")
+}
+
+/// რომელი `attributes` ჩანს კატალოგში ფილტრად
+model AttributeDefinition {
+  key           String  @id
+  /// სახელი ორივე ენაზე: { "ka": "კონექტორი", "en": "Connector" }
+  label         Json
+  /// text | number | enum
+  type          String
+  /// enum-ისთვის შესაძლო მნიშვნელობები
+  options       Json?
+  unit          String?
+  is_filterable Boolean @default(true)
+  sort_order    Int     @default(0)
+
+  @@map("attribute_definitions")
+}
+
+// ---------------------------------------------------------------------------
+// თავსებადობა
+// ---------------------------------------------------------------------------
+
+model ChargerBrand {
+  id         String   @id @default(uuid()) @db.Uuid
+  slug       String   @unique
+  name       String
+  logo_key   String?
+  sort_order Int      @default(0)
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @updatedAt @db.Timestamptz
+
+  models ChargerModel[]
+
+  @@map("charger_brands")
+}
+
+model ChargerModel {
+  id         String   @id @default(uuid()) @db.Uuid
+  brand_id   String   @db.Uuid
+  slug       String
+  name       String
+  /// ვერსია / რევიზია / თაობა
+  revision   String?
+  power_kw   Decimal? @db.Decimal(6, 2)
+  image_key  String?
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamptz
+  updated_at DateTime @updatedAt @db.Timestamptz
+
+  brand    ChargerBrand           @relation(fields: [brand_id], references: [id], onDelete: Restrict)
+  products ProductCompatibility[]
+
+  @@unique([brand_id, slug])
+  @@map("charger_models")
+}
+
+model ProductCompatibility {
+  product_id       String  @db.Uuid
+  charger_model_id String  @db.Uuid
+  /// მაგ. „მხოლოდ 2023 წლის შემდეგ გამოშვებულ ვერსიაზე“
+  note             String?
+
+  product       Product      @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  charger_model ChargerModel @relation(fields: [charger_model_id], references: [id], onDelete: Cascade)
+
+  @@id([product_id, charger_model_id])
+  // ფილტრი მუშაობს ამ მიმართულებით: მოდელი → პროდუქტები
+  @@index([charger_model_id, product_id])
+  @@map("product_compatibility")
+}
+
+// ---------------------------------------------------------------------------
+// მარაგი (ერთი საწყობი)
+// ---------------------------------------------------------------------------
+
+enum StockMovementType {
+  RECEIPT
+  SALE
+  RETURN
+  ADJUSTMENT
+  DAMAGE
+
+  @@map("stock_movement_type")
+}
+
+enum ReservationStatus {
+  ACTIVE
+  COMMITTED
+  RELEASED
+
+  @@map("reservation_status")
+}
+
+/// ხელმისაწვდომი = on_hand - reserved.
+/// CHECK შეზღუდვები (on_hand >= 0, reserved >= 0, reserved <= on_hand) ემატება მიგრაციაში SQL-ით.
+model InventoryItem {
+  product_id          String   @id @db.Uuid
+  on_hand             Int      @default(0)
+  reserved            Int      @default(0)
+  low_stock_threshold Int      @default(2)
+  updated_at          DateTime @updatedAt @db.Timestamptz
+
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@map("inventory_items")
+}
+
+/// ყველა ცვლილების ისტორია. მხოლოდ INSERT.
+model StockMovement {
+  id         String            @id @default(uuid()) @db.Uuid
+  product_id String            @db.Uuid
+  type       StockMovementType
+  /// + ან −
+  quantity   Int
+  order_id   String?           @db.Uuid
+  reason     String?
+  /// ადმინის Identity id (sub)
+  actor_id   String?
+  created_at DateTime          @default(now()) @db.Timestamptz
+
+  product Product @relation(fields: [product_id], references: [id], onDelete: Restrict)
+
+  @@index([product_id, created_at])
+  @@map("stock_movements")
+}
+
+model StockReservation {
+  id         String            @id @default(uuid()) @db.Uuid
+  order_id   String            @db.Uuid
+  product_id String            @db.Uuid
+  quantity   Int
+  status     ReservationStatus @default(ACTIVE)
+  expires_at DateTime          @db.Timestamptz
+  created_at DateTime          @default(now()) @db.Timestamptz
+
+  product Product @relation(fields: [product_id], references: [id], onDelete: Restrict)
+
+  @@index([status, expires_at])
+  @@index([order_id])
+  @@map("stock_reservations")
+}

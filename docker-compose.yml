@@ -1,0 +1,51 @@
+# ლოკალური ინფრასტრუქტურა: `docker compose up -d`
+# აპი ლოკალურად ეშვება `pnpm start:dev`-ით (არა Docker-ში).
+name: icomers
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: icomers
+      POSTGRES_PASSWORD: icomers
+      POSTGRES_DB: icomers
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U icomers']
+      interval: 5s
+      retries: 10
+
+  # NATS JetStream (ივენთები) — საჭიროა ეტაპ 2-დან
+  nats:
+    image: nats:2
+    command: ['-js', '-m', '8222']
+    ports:
+      - '4222:4222'
+      - '8222:8222'
+
+  # ლოკალური S3 (პროდუქტის სურათები). Console: http://localhost:9001
+  minio:
+    image: minio/minio
+    command: server /data --console-address ':9001'
+    environment:
+      MINIO_ROOT_USER: icomers
+      MINIO_ROOT_PASSWORD: icomers-secret
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio-data:/data
+
+  # Email-ის ტესტირება. გაგზავნილი წერილები: http://localhost:8025
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+
+volumes:
+  postgres-data:
+  minio-data:
