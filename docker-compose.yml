@@ -27,17 +27,24 @@ services:
       - '8222:8222'
 
   # ლოკალური S3 (პროდუქტის სურათები). Console: http://localhost:9001
-  minio:
-    image: minio/minio
-    command: server /data --console-address ':9001'
-    environment:
-      MINIO_ROOT_USER: icomers
-      MINIO_ROOT_PASSWORD: icomers-secret
-    ports:
-      - '9000:9000'
-      - '9001:9001'
-    volumes:
-      - minio-data:/data
+  #
+  # ⚠️ დროებით გათიშულია: MinIO-ს community image-ები აღარ არის თავისუფლად
+  # ჩამოსატვირთი — `minio/minio` Docker Hub-ზე აღარ არსებობს, quay.io-ზე კი
+  # ავტორიზაციას მოითხოვს. საჭიროა ჩანაცვლება (localstack / seaweedfs / garage /
+  # adobe-s3mock) — გადაწყვეტილება ჯერ არ არის მიღებული.
+  # S3 რეალურად ეტაპ 1-იდან დაგვჭირდება (პროდუქტის სურათების ატვირთვა).
+  #
+  # minio:
+  #   image: minio/minio
+  #   command: server /data --console-address ':9001'
+  #   environment:
+  #     MINIO_ROOT_USER: icomers
+  #     MINIO_ROOT_PASSWORD: icomers-secret
+  #   ports:
+  #     - '9000:9000'
+  #     - '9001:9001'
+  #   volumes:
+  #     - minio-data:/data
 
   # Email-ის ტესტირება. გაგზავნილი წერილები: http://localhost:8025
   mailpit:
@@ -48,4 +55,4 @@ services:
 
 volumes:
   postgres-data:
-  minio-data:
+  # minio-data:

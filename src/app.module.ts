@@ -6,6 +6,8 @@ import { randomUUID } from 'node:crypto';
 import { validateEnv, type Env } from './config/env.js';
 import { ProblemDetailsFilter } from './common/filters/problem-details.filter.js';
 import { PrismaModule } from './infra/prisma/prisma.module.js';
+import { AuthModule } from './modules/auth/auth.module.js';
+import { CatalogModule } from './modules/catalog/catalog.module.js';
 import { HealthModule } from './modules/health/health.module.js';
 
 /**
@@ -39,7 +41,9 @@ import { HealthModule } from './modules/health/health.module.js';
       }),
     }),
     PrismaModule,
+    AuthModule,
     HealthModule,
+    CatalogModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: ProblemDetailsFilter }],
 })

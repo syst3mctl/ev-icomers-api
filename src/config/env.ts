@@ -33,6 +33,21 @@ const envSchema = z.object({
     ),
 
   RESERVATION_TTL_MINUTES: z.coerce.number().int().positive().default(15),
+
+  /**
+   * მხოლოდ ლოკალური დეველოპმენტისთვის: რომელი როლებით მივდივართ `/v1/admin/*`-ზე,
+   * სანამ Identity-ის JWT-ის შემოწმება არ გაკეთდება (იხ. `AdminGuard`).
+   * `NODE_ENV=development`-ის გარეთ არ მოქმედებს.
+   */
+  DEV_ADMIN_ROLES: z
+    .string()
+    .default('')
+    .transform((v) =>
+      v
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean),
+    ),
 });
 
 export type Env = z.infer<typeof envSchema>;

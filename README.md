@@ -7,22 +7,20 @@ icomers ონლაინ მაღაზიის backend: **NestJS** (modular
 
 ## რა უნდა იყოს დაყენებული
 
-- Node.js 24 LTS
+- Node.js 24 LTS — რეპოში არის `.nvmrc`, ამიტომ `nvm use` საკმარისია.
+  **Prisma 7 არ უშვებს Node 23-ს** (საჭიროა 20.19+ / 22.12+ / 24+), ამიტომ `node -v` წინასწარ შეამოწმე.
 - pnpm: `corepack enable`
 - Docker Desktop
 
 ## პირველი გაშვება
 
 ```bash
+nvm use                       # Node 24
 cp .env.example .env
-docker compose up -d          # Postgres, NATS, MinIO, Mailpit
+docker compose up -d          # Postgres, NATS, Mailpit (MinIO დროებით გათიშულია — იხ. „ცნობილი პრობლემები“)
 pnpm install                  # აგენერირებს Prisma client-საც
 
-# ბაზა (მხოლოდ პირველად — იხ. „ბაზა“ ქვემოთ)
-pnpm db:migrate --name init
-pnpm prisma migrate dev --create-only --name inventory_checks
-#   → ახლად შექმნილ prisma/migrations/*_inventory_checks/migration.sql-ში ჩასვი prisma/sql/inventory_checks.sql-ის შიგთავსი
-pnpm db:migrate
+pnpm db:migrate               # მიგრაციები უკვე რეპოშია — მხოლოდ გამოყენება
 pnpm db:seed                  # სატესტო კატეგორიები, დამტენები, პროდუქტები
 
 pnpm start:dev                # API: http://localhost:4000
@@ -33,6 +31,13 @@ pnpm start:dev                # API: http://localhost:4000
 - Health: http://localhost:4000/health/live, http://localhost:4000/health/ready
 - Prisma Studio (ბაზის დათვალიერება): `pnpm db:studio`
 - Worker: `pnpm start:worker`
+
+სწრაფი შემოწმება:
+
+```bash
+curl -s localhost:4000/health/ready                  # {"status":"ok"}
+curl -s localhost:4000/v1/admin/categories           # seed-ის კატეგორიები
+```
 
 ## ბრძანებები
 
@@ -61,6 +66,40 @@ pnpm start:dev                # API: http://localhost:4000
 - DTO-ები აღიწერება `class-validator`-ით და `@nestjs/swagger`-ის დეკორატორებით, რომ `openapi.json` სრული იყოს.
 - API-ს ცვლილების შემდეგ: `pnpm openapi:export` და `openapi.json` commit-ში (CI ამას ამოწმებს).
 
+## ადმინის endpoint-ები და ავტორიზაცია
+
+`/v1/admin/*` დაცულია `AdminGuard`-ით (`src/modules/auth/admin.guard.ts`), როლები `@Roles()`-ით.
+
+⚠️ **JWT-ის შემოწმება JWKS-ით ჯერ არ არის დაწერილი** — Identity-ის issuer და client-ები ჯერ არ გვაქვს
+(`PROJECT.md` §3 → ღია კითხვა `identity-oidc`). სანამ ეს გაირკვევა, guard **დახურულია**:
+
+| `NODE_ENV` | ქცევა |
+|---|---|
+| `development` | როლები მოდის `DEV_ADMIN_ROLES`-იდან (`.env`) ან `X-Dev-Roles` header-იდან. ტოკენი არ მოწმდება |
+| ყველა სხვა (`test`, `production`) | ყოველთვის `503 AUTH_NOT_CONFIGURED` |
+
+ასე staging/production-ზე ადმინის endpoint-ები შემთხვევით ღია ვერ დარჩება.
+
+```bash
+# ლოკალურად: .env-ში DEV_ADMIN_ROLES=admin
+curl -s localhost:4000/v1/admin/products
+
+# სხვა როლის შემოწმება კონკრეტულ მოთხოვნაზე
+curl -s -H 'X-Dev-Roles: warehouse' localhost:4000/v1/admin/products   # 403 FORBIDDEN
+```
+
+როცა Identity გაიხსნება: `admin.guard.ts`-ში ემატება ტოკენის ვერიფიკაცია (`jose` + JWKS) და
+`roles` claim-ის წაკითხვა; `@Roles()`-ის ლოგიკა და controller-ები უცვლელი რჩება.
+
+## ცნობილი პრობლემები (ლოკალური გარემო)
+
+| პრობლემა | მიზეზი და გამოსავალი |
+|---|---|
+| `pnpm install` ვარდება: *„Prisma only supports Node.js versions 20.19+, 22.12+, 24.0+“* | სისტემაში Homebrew-ის Node 23-ია. `nvm use` (რეპოში `.nvmrc`), ან სამუდამოდ `nvm alias default 24` |
+| `docker compose up -d` ვარდება: *„pull access denied for minio/minio“* | MinIO-ს community image-ები აღარ არის თავისუფლად ჩამოსატვირთი: `minio/minio` Docker Hub-ზე აღარ არსებობს, quay.io-ზე ავტორიზაციას ითხოვს. სერვისი დროებით კომენტარშია `docker-compose.yml`-ში. S3 ეტაპ 1-იდან დაგვჭირდება — მაშინ შეირჩევა ჩანაცვლება (localstack / seaweedfs / garage / adobe-s3mock) |
+| macOS: *„You can't open the application Docker because it is not responding“* | Docker Desktop-ის GUI მოკვდა, backend პროცესები მიტოვებული დარჩა. გაასუფთავე და ხელახლა გაუშვი: `pkill -f 'Docker.app/Contents/MacOS'` → `open -a Docker` |
+| ტესტებში ადმინის endpoint-ი 503-ს აბრუნებს | ასე უნდა იყოს: e2e `NODE_ENV=test`-ზე გარბის. endpoint-ის ტესტირებისას guard გადაფარე `.overrideGuard(AdminGuard)`-ით (**არა** `overrideProvider`-ით — guard-ზე ის არ მოქმედებს). მაგალითი: `test/admin-catalog.e2e-spec.ts` |
+
 ## სტრუქტურა
 
 ```
@@ -70,13 +109,18 @@ src/
   app.module.ts         API-ს მოდულები
   app.setup.ts          საერთო პარამეტრები (ვერსია, ვალიდაცია)
   config/env.ts         env ცვლადები და მათი შემოწმება
-  common/               საერთო: შეცდომების ფორმატი
-  infra/prisma/         ბაზასთან კავშირი
-  modules/              ბიზნეს-მოდულები (health; შემდეგ catalog, compatibility, inventory, ...)
+  common/               საერთო: შეცდომების ფორმატი, pagination, ენები
+  infra/prisma/         ბაზასთან კავშირი და Prisma-ს შეცდომების ამოცნობა
+  modules/
+    health/             /health/live, /health/ready
+    auth/               AdminGuard, @Roles() (JWT ჯერ არ არის — იხ. ზემოთ)
+    catalog/            კატეგორიები და პროდუქტები (ჯერ მხოლოდ /v1/admin/...)
+    ...                 შემდეგ: compatibility, inventory, cart, orders, ...
   worker/               Worker-ის მოდულები
   generated/prisma/     Prisma client (გენერირებული, git-ში არ არის)
 prisma/
   schema.prisma         ბაზის სქემა
+  migrations/           მიგრაციები (commit-ში)
   seed.ts               სატესტო მონაცემები
   sql/                  დამატებითი SQL მიგრაციებისთვის
 ```

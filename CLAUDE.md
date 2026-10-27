@@ -25,7 +25,8 @@ icomers ონლაინ მაღაზიის backend. **მთელი �
 ## ბრძანებები
 
 ```bash
-docker compose up -d        # Postgres, NATS, MinIO, Mailpit
+nvm use                     # Node 24 — სისტემაში Node 23-ია, Prisma მას არ უშვებს
+docker compose up -d        # Postgres, NATS, Mailpit (MinIO დროებით გათიშულია)
 pnpm start:dev              # API → http://localhost:4000 (Swagger: /docs)
 pnpm start:worker           # Worker
 pnpm lint && pnpm typecheck
@@ -71,9 +72,11 @@ prisma/
 - **შეცდომები:** ბიზნეს-შეცდომა `throw new AppError(status, 'CODE', 'detail')`. `code` მუდმივია და `UPPER_SNAKE_CASE`.
 - **ფული:** მხოლოდ `Int`, თეთრებში, ველის სახელი `*_minor`.
 - **მარაგი** იცვლება მხოლოდ ტრანზაქციაში (`prisma.$transaction`), შეკვეთასთან ერთად; დაჯავშნა ერთი `UPDATE ... WHERE on_hand - reserved >= qty`-ით (`docs/04-data-model.md` §4).
+- **Prisma თუ raw SQL:** CRUD — Prisma; რთული/ცხელი query — `$queryRaw` (მარაგის დაჯავშნა, თავსებადობის ფილტრი, ფასეტების დათვლა). ORM-ის ჩანაცვლება არ იგეგმება — გაზომილია (`docs/01-tech-stack.md` §3). `include`-ის ნაცვლად `select`, სადაც ყველა სვეტი არ გვჭირდება; ახალი ცხელი query — `EXPLAIN ANALYZE`-ით.
 - **ბაზის სქემა:** ცხრილები და ველები `snake_case` (Prisma-ს მოდელები PascalCase, `@@map`-ით). ყოველი ცვლილება — მიგრაცია (`pnpm db:migrate --name ...`), ხელით რედაქტირება არა.
 - **კომპანიის სერვისები** (Billing, Fiscal, Identity) მხოლოდ ინტერფეისის მიღმა (`PaymentGateway`, `FiscalGateway`): gRPC იმპლემენტაცია + mock ტესტებისთვის. proto ფაილები ჯერ არ გვაქვს — ბიზნეს-ლოგიკა ინტერფეისზე იწერება.
-- **ავტორიზაცია:** ყველა `/v1/admin/*` — JWT guard + `@Roles()`. საჯარო endpoint-ზე `@Public()`.
+- **ავტორიზაცია:** ყველა `/v1/admin/*` — `@UseGuards(AdminGuard)` + `@Roles()` (`src/modules/auth/`). ტოკენის ვერიფიკაცია ჯერ არ არის (Identity გვაკლია), guard dev-ის გარეთ `503`-ს აბრუნებს — დეტალები README-ში.
+- **ტესტებში guard-ის გადაფარვა:** `.overrideGuard(AdminGuard)`, არა `.overrideProvider()` — guard-ზე ის არ მოქმედებს.
 - **ტესტები:** ფული, მარაგი, შეკვეთის სტატუსები და checkout — აუცილებლად. სავალდებულო: 10 პარალელური checkout ბოლო ერთეულზე → წარმატებით მხოლოდ 1.
 - **API-ს ცვლილების შემდეგ:** `pnpm openapi:export` და `openapi.json` commit-ში — ამაზეა დამოკიდებული ორივე ფრონტი (`SYSTEM.md` §5).
 - **ლოგებში** პერსონალური მონაცემები (ტელეფონი, email, მისამართი, ტოკენი) არ იწერება.
@@ -93,5 +96,9 @@ prisma/
 ## სტატუსი
 
 - ✅ საფუძველი: NestJS, config, ლოგები, problem+json, health, Swagger, Prisma-ს სქემა (კატალოგი, თავსებადობა, მარაგი), seed, docker-compose, Dockerfile, CI.
-- ⏭ შემდეგი: პირველი მიგრაცია (README → „პირველი გაშვება“), შემდეგ `catalog`, `compatibility`, `inventory` მოდულები ადმინკისთვის (`/v1/admin/...`).
+- ✅ ლოკალური გარემო გამართულია: მიგრაციები (`init`, `inventory_checks`) რეპოშია და გამოყენებულია, seed გარბის, API ადგება.
+- ✅ `catalog` მოდული — ადმინის endpoint-ები: `/v1/admin/categories` (CRUD), `/v1/admin/products` (სია, შექმნა, ცვლილება, არქივი).
+- ✅ `auth` მოდული — `AdminGuard` + `@Roles()`. **JWT/JWKS ჯერ არ არის**: dev-ში როლები `DEV_ADMIN_ROLES`/`X-Dev-Roles`-იდან, სხვაგან `503 AUTH_NOT_CONFIGURED` (README → „ადმინის endpoint-ები და ავტორიზაცია“).
+- ⏭ შემდეგი: `compatibility` და `inventory` მოდულები ადმინკისთვის, შემდეგ საჯარო `/v1/catalog/...`.
+- ⚠️ გადასაწყვეტია: MinIO-ს ჩანაცვლება ლოკალური S3-ისთვის (README → „ცნობილი პრობლემები“). საჭირო ხდება ეტაპ 1-ზე, სურათების ატვირთვისას.
 - სამუშაოს დასრულებისას განაახლე `../icomers/PROJECT.md` (§1, §2, §7).

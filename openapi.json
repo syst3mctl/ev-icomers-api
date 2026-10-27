@@ -42,6 +42,447 @@
           "health"
         ]
       }
+    },
+    "/v1/admin/categories": {
+      "get": {
+        "operationId": "AdminCategoriesController_list_v1",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page_size",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 24,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryListResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "კატეგორიების სია",
+        "tags": [
+          "admin/catalog"
+        ]
+      },
+      "post": {
+        "operationId": "AdminCategoriesController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ახალი კატეგორია",
+        "tags": [
+          "admin/catalog"
+        ]
+      }
+    },
+    "/v1/admin/categories/{id}": {
+      "get": {
+        "operationId": "AdminCategoriesController_getById_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ერთი კატეგორია",
+        "tags": [
+          "admin/catalog"
+        ]
+      },
+      "patch": {
+        "operationId": "AdminCategoriesController_update_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "კატეგორიის შეცვლა",
+        "tags": [
+          "admin/catalog"
+        ]
+      },
+      "delete": {
+        "description": "იშლება მხოლოდ ცარიელი კატეგორია. წინააღმდეგ შემთხვევაში `409 CATEGORY_NOT_EMPTY`.",
+        "operationId": "AdminCategoriesController_remove_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "კატეგორიის წაშლა",
+        "tags": [
+          "admin/catalog"
+        ]
+      }
+    },
+    "/v1/admin/products": {
+      "get": {
+        "operationId": "AdminProductsController_list_v1",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page_size",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 24,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "ფილტრი სტატუსით; მითითების გარეშე ბრუნდება ყველა",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "ACTIVE",
+                "ARCHIVED"
+              ]
+            }
+          },
+          {
+            "name": "category_id",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "ძებნა: SKU, slug, OEM ნომერი, დასახელება",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "newest",
+              "type": "string",
+              "enum": [
+                "newest",
+                "oldest",
+                "price_asc",
+                "price_desc",
+                "sku_asc"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductListResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "პროდუქტების სია ფილტრებით",
+        "tags": [
+          "admin/catalog"
+        ]
+      },
+      "post": {
+        "operationId": "AdminProductsController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProductDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ახალი პროდუქტი",
+        "tags": [
+          "admin/catalog"
+        ]
+      }
+    },
+    "/v1/admin/products/{id}": {
+      "get": {
+        "operationId": "AdminProductsController_getById_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ერთი პროდუქტი: თარგმანები და სურათები",
+        "tags": [
+          "admin/catalog"
+        ]
+      },
+      "patch": {
+        "operationId": "AdminProductsController_update_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "პროდუქტის შეცვლა",
+        "tags": [
+          "admin/catalog"
+        ]
+      }
+    },
+    "/v1/admin/products/{id}/archive": {
+      "post": {
+        "description": "პროდუქტი არ იშლება — მასზე შეკვეთები და მარაგის ისტორია შეიძლება იყოს მიბმული.",
+        "operationId": "AdminProductsController_archive_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "არქივში გადატანა",
+        "tags": [
+          "admin/catalog"
+        ]
+      }
     }
   },
   "info": {
@@ -64,6 +505,706 @@
       "HealthResponse": {
         "type": "object",
         "properties": {}
+      },
+      "CategoryTranslationResponse": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "ka",
+              "en"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "seo_title": {
+            "type": "string",
+            "nullable": true
+          },
+          "seo_description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "locale",
+          "name",
+          "description",
+          "seo_title",
+          "seo_description"
+        ]
+      },
+      "CategoryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "parent_id": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "sort_order": {
+            "type": "number"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryTranslationResponse"
+            }
+          },
+          "product_count": {
+            "type": "number",
+            "description": "პროდუქტების რაოდენობა ამ კატეგორიაში"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "parent_id",
+          "slug",
+          "sort_order",
+          "is_active",
+          "translations",
+          "product_count",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "CategoryListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryResponse"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "page_size": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ]
+      },
+      "CategoryTranslationDto": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "ka",
+              "en"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "კაბელები"
+          },
+          "description": {
+            "type": "object",
+            "nullable": true
+          },
+          "seo_title": {
+            "type": "object",
+            "nullable": true,
+            "maxLength": 200
+          },
+          "seo_description": {
+            "type": "object",
+            "nullable": true,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "locale",
+          "name"
+        ]
+      },
+      "CreateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "example": "cables"
+          },
+          "parent_id": {
+            "type": "object",
+            "nullable": true,
+            "format": "uuid",
+            "description": "მშობელი კატეგორია; `null` — ზედა დონე"
+          },
+          "sort_order": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0
+          },
+          "is_active": {
+            "type": "boolean",
+            "default": true
+          },
+          "translations": {
+            "description": "`ka` სავალდებულოა",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryTranslationDto"
+            }
+          }
+        },
+        "required": [
+          "slug",
+          "translations"
+        ]
+      },
+      "UpdateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "example": "cables"
+          },
+          "parent_id": {
+            "type": "object",
+            "nullable": true,
+            "format": "uuid",
+            "description": "მშობელი კატეგორია; `null` — ზედა დონე"
+          },
+          "sort_order": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0
+          },
+          "is_active": {
+            "type": "boolean",
+            "default": true
+          },
+          "translations": {
+            "description": "`ka` სავალდებულოა",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryTranslationDto"
+            }
+          }
+        }
+      },
+      "ProductListItemResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "ACTIVE",
+              "ARCHIVED"
+            ]
+          },
+          "category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "category_slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "სახელი `ka`-ზე (ან პირველი არსებული)"
+          },
+          "price_minor": {
+            "type": "number"
+          },
+          "compare_at_price_minor": {
+            "type": "number",
+            "nullable": true
+          },
+          "is_universal": {
+            "type": "boolean"
+          },
+          "is_featured": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "sku",
+          "slug",
+          "status",
+          "category_id",
+          "category_slug",
+          "name",
+          "price_minor",
+          "compare_at_price_minor",
+          "is_universal",
+          "is_featured",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "ProductListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductListItemResponse"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "page_size": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ]
+      },
+      "ProductTranslationResponse": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "ka",
+              "en"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "short_description": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "seo_title": {
+            "type": "string",
+            "nullable": true
+          },
+          "seo_description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "locale",
+          "name",
+          "short_description",
+          "description",
+          "seo_title",
+          "seo_description"
+        ]
+      },
+      "ProductImageResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "storage_key": {
+            "type": "string"
+          },
+          "alt": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "alt ტექსტი ენებად: `{ \"ka\": \"...\", \"en\": \"...\" }`"
+          },
+          "sort_order": {
+            "type": "number"
+          },
+          "width": {
+            "type": "number",
+            "nullable": true
+          },
+          "height": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "storage_key",
+          "alt",
+          "sort_order",
+          "width",
+          "height"
+        ]
+      },
+      "ProductResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "ACTIVE",
+              "ARCHIVED"
+            ]
+          },
+          "category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "category_slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "სახელი `ka`-ზე (ან პირველი არსებული)"
+          },
+          "price_minor": {
+            "type": "number"
+          },
+          "compare_at_price_minor": {
+            "type": "number",
+            "nullable": true
+          },
+          "is_universal": {
+            "type": "boolean"
+          },
+          "is_featured": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "vat_rate_bp": {
+            "type": "number"
+          },
+          "oem_part_numbers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attributes": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "weight_g": {
+            "type": "number",
+            "nullable": true
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductTranslationResponse"
+            }
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductImageResponse"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "sku",
+          "slug",
+          "status",
+          "category_id",
+          "category_slug",
+          "name",
+          "price_minor",
+          "compare_at_price_minor",
+          "is_universal",
+          "is_featured",
+          "created_at",
+          "updated_at",
+          "vat_rate_bp",
+          "oem_part_numbers",
+          "attributes",
+          "weight_g",
+          "translations",
+          "images"
+        ]
+      },
+      "ProductTranslationDto": {
+        "type": "object",
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "ka",
+              "en"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 300,
+            "example": "Type 2 კაბელი 32A, 5მ"
+          },
+          "short_description": {
+            "type": "object",
+            "nullable": true,
+            "maxLength": 500
+          },
+          "description": {
+            "type": "object",
+            "nullable": true
+          },
+          "seo_title": {
+            "type": "object",
+            "nullable": true,
+            "maxLength": 200
+          },
+          "seo_description": {
+            "type": "object",
+            "nullable": true,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "locale",
+          "name"
+        ]
+      },
+      "CreateProductDto": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]+(?:-[A-Z0-9]+)*$",
+            "example": "CBL-T2-32-5"
+          },
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "example": "type2-cable-32a-5m"
+          },
+          "category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "ACTIVE",
+              "ARCHIVED"
+            ],
+            "default": "DRAFT"
+          },
+          "price_minor": {
+            "type": "number",
+            "minimum": 0,
+            "description": "ფასი თეთრებში, დღგ-ის ჩათვლით",
+            "example": 32900
+          },
+          "compare_at_price_minor": {
+            "type": "object",
+            "nullable": true,
+            "minimum": 0,
+            "description": "გადახაზული „ძველი ფასი“ თეთრებში"
+          },
+          "vat_rate_bp": {
+            "type": "number",
+            "default": 1800,
+            "minimum": 0,
+            "description": "დღგ basis points-ში: 1800 = 18.00%"
+          },
+          "oem_part_numbers": {
+            "default": [],
+            "description": "ქარხნული (OEM) ნომრები — ძებნაში მონაწილეობენ",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attributes": {
+            "type": "object",
+            "additionalProperties": true,
+            "default": {},
+            "description": "ტექნიკური მახასიათებლები: `{ \"connector\": \"Type 2\" }`"
+          },
+          "is_universal": {
+            "type": "boolean",
+            "default": false,
+            "description": "ერგება ყველა დამტენის მოდელს"
+          },
+          "is_featured": {
+            "type": "boolean",
+            "default": false
+          },
+          "weight_g": {
+            "type": "object",
+            "nullable": true,
+            "minimum": 0
+          },
+          "translations": {
+            "description": "`ka` სავალდებულოა",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductTranslationDto"
+            }
+          }
+        },
+        "required": [
+          "sku",
+          "slug",
+          "category_id",
+          "price_minor",
+          "translations"
+        ]
+      },
+      "UpdateProductDto": {
+        "type": "object",
+        "properties": {
+          "sku": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]+(?:-[A-Z0-9]+)*$",
+            "example": "CBL-T2-32-5"
+          },
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "example": "type2-cable-32a-5m"
+          },
+          "category_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "ACTIVE",
+              "ARCHIVED"
+            ],
+            "default": "DRAFT"
+          },
+          "price_minor": {
+            "type": "number",
+            "minimum": 0,
+            "description": "ფასი თეთრებში, დღგ-ის ჩათვლით",
+            "example": 32900
+          },
+          "compare_at_price_minor": {
+            "type": "object",
+            "nullable": true,
+            "minimum": 0,
+            "description": "გადახაზული „ძველი ფასი“ თეთრებში"
+          },
+          "vat_rate_bp": {
+            "type": "number",
+            "default": 1800,
+            "minimum": 0,
+            "description": "დღგ basis points-ში: 1800 = 18.00%"
+          },
+          "oem_part_numbers": {
+            "default": [],
+            "description": "ქარხნული (OEM) ნომრები — ძებნაში მონაწილეობენ",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attributes": {
+            "type": "object",
+            "additionalProperties": true,
+            "default": {},
+            "description": "ტექნიკური მახასიათებლები: `{ \"connector\": \"Type 2\" }`"
+          },
+          "is_universal": {
+            "type": "boolean",
+            "default": false,
+            "description": "ერგება ყველა დამტენის მოდელს"
+          },
+          "is_featured": {
+            "type": "boolean",
+            "default": false
+          },
+          "weight_g": {
+            "type": "object",
+            "nullable": true,
+            "minimum": 0
+          },
+          "translations": {
+            "description": "`ka` სავალდებულოა",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductTranslationDto"
+            }
+          }
+        }
       }
     }
   }
