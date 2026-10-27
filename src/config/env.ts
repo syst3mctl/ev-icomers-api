@@ -21,6 +21,16 @@ const envSchema = z.object({
     .default('true')
     .transform((v) => v === 'true'),
 
+  /**
+   * `true` → ლოგში იწერება ყველა SQL query, პარამეტრებით და ხანგრძლივობით.
+   * მხოლოდ გასარკვევად (რა SQL-ს აწარმოებს Prisma-ს კოდი) — ლოგი ბევრია,
+   * ამიტომ `development`-ის გარეთ არ მოქმედებს.
+   */
+  LOG_SQL: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((v) => v === 'true'),
+
   /** მძიმით გამოყოფილი სია: http://localhost:3000,http://localhost:3001 */
   CORS_ORIGINS: z
     .string()
