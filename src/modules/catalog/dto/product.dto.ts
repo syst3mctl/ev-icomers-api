@@ -244,3 +244,16 @@ export class ProductListResponse {
   @ApiProperty() page_size!: number;
   @ApiProperty() total!: number;
 }
+
+/**
+ * პროდუქტის მინიმალური აღწერა სხვა მოდულების პასუხებისთვის
+ * (`inventory`, `compatibility`): იმდენი, რამდენიც ცხრილში სტრიქონის საჩვენებლად საჭიროა.
+ */
+export class ProductSummaryResponse {
+  @ApiProperty({ format: 'uuid' }) id!: string;
+  @ApiProperty() sku!: string;
+  @ApiProperty() slug!: string;
+  @ApiProperty({ enum: PRODUCT_STATUSES }) status!: ProductStatus;
+  @ApiProperty({ description: 'სახელი `ka`-ზე (ან პირველი არსებული)' })
+  name!: string;
+}

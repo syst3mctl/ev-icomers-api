@@ -8,7 +8,9 @@ import { ProblemDetailsFilter } from './common/filters/problem-details.filter.js
 import { PrismaModule } from './infra/prisma/prisma.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
+import { CompatibilityModule } from './modules/compatibility/compatibility.module.js';
 import { HealthModule } from './modules/health/health.module.js';
+import { InventoryModule } from './modules/inventory/inventory.module.js';
 
 /**
  * მოდულები (docs/02-architecture.md §3). ახალი მოდული ემატება `modules/`-ში და აქ imports-ში:
@@ -44,6 +46,8 @@ import { HealthModule } from './modules/health/health.module.js';
     AuthModule,
     HealthModule,
     CatalogModule,
+    CompatibilityModule,
+    InventoryModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: ProblemDetailsFilter }],
 })

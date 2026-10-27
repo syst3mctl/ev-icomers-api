@@ -13,6 +13,7 @@ import type {
   CreateProductDto,
   ProductListResponse,
   ProductResponse,
+  ProductSummaryResponse,
   ProductTranslationDto,
   UpdateProductDto,
 } from './dto/product.dto.js';
@@ -253,6 +254,97 @@ export class ProductsService {
     return toProductResponse(updated);
   }
 
+  // ------------------------------------------------------------------
+  // სხვა მოდულებისთვის (`compatibility`, `inventory`): ისინი `products`-ს
+  // პირდაპირ არ კითხულობენ — CLAUDE.md → „წესები ამ რეპოში“ → მოდულები.
+  // ------------------------------------------------------------------
+
+  /** პროდუქტი არსებობს თუ არა; არ არსებობს → `404 PRODUCT_NOT_FOUND` */
+  async assertExists(id: string): Promise<void> {
+    const found = await this.prisma.product.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+    if (!found) {
+      throw new AppError(404, 'PRODUCT_NOT_FOUND', `პროდუქტი ${id} ვერ მოიძებნა`);
+    }
+  }
+
+  /** რომელი id-ები არ არსებობს (ცარიელი მასივი — ყველა არსებობს) */
+  async findMissingIds(ids: string[]): Promise<string[]> {
+    if (ids.length === 0) return [];
+    const rows = await this.prisma.product.findMany({
+      where: { id: { in: ids } },
+      select: { id: true },
+    });
+    const found = new Set(rows.map((r) => r.id));
+    return ids.filter((id) => !found.has(id));
+  }
+
+  /** მოკლე აღწერები id-ებით; რიგითობა მოთხოვნილი id-ების მიხედვით */
+  async summariesByIds(ids: string[]): Promise<ProductSummaryResponse[]> {
+    if (ids.length === 0) return [];
+    const rows = await this.prisma.product.findMany({
+      where: { id: { in: ids } },
+      select: {
+        id: true,
+        sku: true,
+        slug: true,
+        status: true,
+        translations: { select: { locale: true, name: true } },
+      },
+    });
+
+    const byId = new Map(
+      rows.map((row) => [
+        row.id,
+        {
+          id: row.id,
+          sku: row.sku,
+          slug: row.slug,
+          status: row.status,
+          name: displayName(row.translations),
+        },
+      ]),
+    );
+    return ids.map((id) => byId.get(id)).filter((s) => s !== undefined);
+  }
+
+  /** პროდუქტების ჯამური რაოდენობა (`inventory`-ის სინქრონიზაციისთვის) */
+  async countAll(): Promise<number> {
+    return this.prisma.product.count();
+  }
+
+  /** ყველა პროდუქტის id (`inventory`-ის სინქრონიზაციისთვის) */
+  async allIds(): Promise<string[]> {
+    const rows = await this.prisma.product.findMany({ select: { id: true } });
+    return rows.map((r) => r.id);
+  }
+
+  /** ერგება თუ არა ყველა დამტენის მოდელს (`compatibility`-ის პასუხისთვის) */
+  async isUniversal(id: string): Promise<boolean> {
+    const row = await this.prisma.product.findUnique({
+      where: { id },
+      select: { is_universal: true },
+    });
+    if (!row) {
+      throw new AppError(404, 'PRODUCT_NOT_FOUND', `პროდუქტი ${id} ვერ მოიძებნა`);
+    }
+    return row.is_universal;
+  }
+
+  /**
+   * `is_universal`-ის ჩართვა/გამორთვა — `compatibility`-ის
+   * `PUT /admin/products/{id}/compatibility`-სთვის.
+   */
+  async setUniversal(id: string, isUniversal: boolean): Promise<void> {
+    await this.assertExists(id);
+    await this.prisma.product.update({
+      where: { id },
+      data: { is_universal: isUniversal },
+    });
+  }
+
   private async assertCategoryExists(categoryId: string): Promise<void> {
     const found = await this.prisma.category.findUnique({
       where: { id: categoryId },
@@ -332,7 +424,7 @@ function assertComparePrice(
 }
 
 /** `ka` სახელი; თუ არ არის — პირველი არსებული */
-function displayName(translations: TranslationRow[]): string {
+function displayName(translations: { locale: string; name: string }[]): string {
   const preferred = translations.find((t) => t.locale === DEFAULT_LOCALE);
   return preferred?.name ?? translations[0]?.name ?? '';
 }

@@ -21,3 +21,6 @@ export const CATALOG_EDITOR_ROLES: Role[] = [
   'manager',
   'admin',
 ];
+
+/** მარაგის მართვა: docs/05-api.md §4 — „warehouse+“ */
+export const INVENTORY_ROLES: Role[] = ['warehouse', 'manager', 'admin'];

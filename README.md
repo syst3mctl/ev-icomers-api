@@ -91,6 +91,23 @@ curl -s -H 'X-Dev-Roles: warehouse' localhost:4000/v1/admin/products   # 403 FOR
 როცა Identity გაიხსნება: `admin.guard.ts`-ში ემატება ტოკენის ვერიფიკაცია (`jose` + JWKS) და
 `roles` claim-ის წაკითხვა; `@Roles()`-ის ლოგიკა და controller-ები უცვლელი რჩება.
 
+### რა არსებობს ახლა
+
+| endpoint-ების ჯგუფი | როლები (`src/modules/auth/roles.ts`) |
+|---|---|
+| `/v1/admin/categories`, `/v1/admin/products` | `CATALOG_EDITOR_ROLES`: `content_editor`, `manager`, `admin` |
+| `/v1/admin/charger-brands`, `/v1/admin/charger-models`, `/v1/admin/products/{id}/compatibility` | იგივე |
+| `/v1/admin/inventory/...` | `INVENTORY_ROLES`: `warehouse`, `manager`, `admin` |
+
+სრული სია: Swagger `/docs` ან `openapi.json`.
+
+**მარაგი.** რაოდენობა პირდაპირ არ იწერება — მხოლოდ ცვლილებით
+(`POST /v1/admin/inventory/{product_id}/movements`), რომ ყველა ნაბიჯი `stock_movements`-ში
+დარჩეს ავტორითა და მიზეზით. `on_hand` და ისტორიის ჩანაწერი ერთ ტრანზაქციაშია; თუ
+შედეგად `on_hand` დაკავებულზე (`reserved`) ნაკლები გამოდის — `409 INSUFFICIENT_STOCK` და
+არაფერი იცვლება. `reserved`-ს ადმინი არ ცვლის: ის checkout-ის დაჯავშნაა
+(`docs/06-order-flow.md`).
+
 ## ცნობილი პრობლემები (ლოკალური გარემო)
 
 | პრობლემა | მიზეზი და გამოსავალი |
@@ -115,7 +132,9 @@ src/
     health/             /health/live, /health/ready
     auth/               AdminGuard, @Roles() (JWT ჯერ არ არის — იხ. ზემოთ)
     catalog/            კატეგორიები და პროდუქტები (ჯერ მხოლოდ /v1/admin/...)
-    ...                 შემდეგ: compatibility, inventory, cart, orders, ...
+    compatibility/      დამტენის ბრენდები/მოდელები და კავშირი პროდუქტებთან
+    inventory/          მარაგი: რაოდენობები და ცვლილებების ისტორია
+    ...                 შემდეგ: cart, orders, checkout, payments, ...
   worker/               Worker-ის მოდულები
   generated/prisma/     Prisma client (გენერირებული, git-ში არ არის)
 prisma/

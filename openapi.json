@@ -483,6 +483,872 @@
           "admin/catalog"
         ]
       }
+    },
+    "/v1/admin/charger-brands": {
+      "get": {
+        "operationId": "AdminChargerBrandsController_list_v1",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page_size",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 24,
+              "type": "number"
+            }
+          },
+          {
+            "name": "is_active",
+            "required": false,
+            "in": "query",
+            "description": "მითითების გარეშე ბრუნდება აქტიურიც და გამორთულიც",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "ძებნა: slug ან სახელი",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargerBrandListResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "დამტენის ბრენდების სია",
+        "tags": [
+          "admin/compatibility"
+        ]
+      },
+      "post": {
+        "operationId": "AdminChargerBrandsController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChargerBrandDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargerBrandResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ახალი ბრენდი",
+        "tags": [
+          "admin/compatibility"
+        ]
+      }
+    },
+    "/v1/admin/charger-brands/{id}": {
+      "get": {
+        "operationId": "AdminChargerBrandsController_getById_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargerBrandResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ერთი ბრენდი",
+        "tags": [
+          "admin/compatibility"
+        ]
+      },
+      "patch": {
+        "operationId": "AdminChargerBrandsController_update_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateChargerBrandDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargerBrandResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ბრენდის შეცვლა",
+        "tags": [
+          "admin/compatibility"
+        ]
+      },
+      "delete": {
+        "description": "იშლება მხოლოდ ბრენდი მოდელების გარეშე, თორემ `409 CHARGER_BRAND_NOT_EMPTY`. დროებით დასამალად გამოიყენე `is_active: false`.",
+        "operationId": "AdminChargerBrandsController_remove_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ბრენდის წაშლა",
+        "tags": [
+          "admin/compatibility"
+        ]
+      }
+    },
+    "/v1/admin/charger-models": {
+      "get": {
+        "operationId": "AdminChargerModelsController_list_v1",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page_size",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 24,
+              "type": "number"
+            }
+          },
+          {
+            "name": "brand_id",
+            "required": false,
+            "in": "query",
+            "description": "ფილტრი ბრენდით",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "is_active",
+            "required": false,
+            "in": "query",
+            "description": "მითითების გარეშე ბრუნდება აქტიურიც და გამორთულიც",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "ძებნა: slug, სახელი ან რევიზია",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargerModelListResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "დამტენის მოდელების სია",
+        "tags": [
+          "admin/compatibility"
+        ]
+      },
+      "post": {
+        "operationId": "AdminChargerModelsController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChargerModelDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargerModelResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ახალი მოდელი",
+        "tags": [
+          "admin/compatibility"
+        ]
+      }
+    },
+    "/v1/admin/charger-models/{id}": {
+      "get": {
+        "operationId": "AdminChargerModelsController_getById_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargerModelResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ერთი მოდელი",
+        "tags": [
+          "admin/compatibility"
+        ]
+      },
+      "patch": {
+        "operationId": "AdminChargerModelsController_update_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateChargerModelDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChargerModelResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "მოდელის შეცვლა",
+        "tags": [
+          "admin/compatibility"
+        ]
+      },
+      "delete": {
+        "description": "მიბმულ მოდელზე პასუხია `409 CHARGER_MODEL_IN_USE`: ჯერ მოხსენი კავშირები ან გამორთე (`is_active: false`).",
+        "operationId": "AdminChargerModelsController_remove_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "მოდელის წაშლა",
+        "tags": [
+          "admin/compatibility"
+        ]
+      }
+    },
+    "/v1/admin/charger-models/{id}/products": {
+      "post": {
+        "description": "არსებული კავშირები არ იშლება; განმეორებითი გამოძახება უვნებელია. პასუხში `added` — ახალი კავშირები, `skipped` — უკვე არსებული.",
+        "operationId": "AdminChargerModelsController_attachProducts_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachProductsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachProductsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ერთ მოდელზე ბევრი პროდუქტის მიბმა",
+        "tags": [
+          "admin/compatibility"
+        ]
+      }
+    },
+    "/v1/admin/charger-models/{id}/products/{product_id}": {
+      "delete": {
+        "operationId": "AdminChargerModelsController_detachProduct_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "product_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ერთი პროდუქტის მოხსნა მოდელიდან",
+        "tags": [
+          "admin/compatibility"
+        ]
+      }
+    },
+    "/v1/admin/products/{id}/compatibility": {
+      "get": {
+        "operationId": "AdminProductCompatibilityController_get_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductCompatibilityResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "პროდუქტის თავსებადი დამტენის მოდელები",
+        "tags": [
+          "admin/compatibility"
+        ]
+      },
+      "put": {
+        "description": "სია **მთლიანად ჩაენაცვლება**: რაც `model_ids`-ში არ არის, წაიშლება. `[]` ყველა კავშირს შლის.",
+        "operationId": "AdminProductCompatibilityController_set_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetProductCompatibilityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductCompatibilityResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "თავსებადი მოდელების სიის ჩანაცვლება",
+        "tags": [
+          "admin/compatibility"
+        ]
+      }
+    },
+    "/v1/admin/inventory": {
+      "get": {
+        "description": "`low_stock=true` — მხოლოდ ის პროდუქტები, რომლებზეც `available <= low_stock_threshold`.",
+        "operationId": "AdminInventoryController_list_v1",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page_size",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 24,
+              "type": "number"
+            }
+          },
+          {
+            "name": "low_stock",
+            "required": false,
+            "in": "query",
+            "description": "`true` — მხოლოდ ის პროდუქტები, რომლებზეც ხელმისაწვდომი მარაგი ზღვარზე ნაკლები ან ტოლია",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "available_asc",
+              "type": "string",
+              "enum": [
+                "available_asc",
+                "available_desc",
+                "updated_desc"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryListResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "მარაგის სია",
+        "tags": [
+          "admin/inventory"
+        ]
+      }
+    },
+    "/v1/admin/inventory/{product_id}": {
+      "get": {
+        "operationId": "AdminInventoryController_getByProductId_v1",
+        "parameters": [
+          {
+            "name": "product_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItemResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ერთი პროდუქტის მარაგი",
+        "tags": [
+          "admin/inventory"
+        ]
+      },
+      "patch": {
+        "description": "რაოდენობა ამ endpoint-იდან არ იცვლება — მხოლოდ `movements`-ით, რომ ყველა ცვლილება ისტორიაში დარჩეს.",
+        "operationId": "AdminInventoryController_updateSettings_v1",
+        "parameters": [
+          {
+            "name": "product_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateInventorySettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItemResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "„ცოტა მარაგის“ ზღვრის შეცვლა",
+        "tags": [
+          "admin/inventory"
+        ]
+      }
+    },
+    "/v1/admin/inventory/{product_id}/movements": {
+      "post": {
+        "description": "ცვლილება და ისტორიის ჩანაწერი ერთ ტრანზაქციაშია. თუ `on_hand` დაკავებულზე (`reserved`) ნაკლები გამოდის — `409 INSUFFICIENT_STOCK` და არაფერი იცვლება.",
+        "operationId": "AdminInventoryController_addMovement_v1",
+        "parameters": [
+          {
+            "name": "product_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStockMovementDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMovementResultResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "მარაგის ცვლილება (მიღება, კორექცია, დაზიანება…)",
+        "tags": [
+          "admin/inventory"
+        ]
+      },
+      "get": {
+        "operationId": "AdminInventoryController_listMovements_v1",
+        "parameters": [
+          {
+            "name": "product_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page_size",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 24,
+              "type": "number"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "RECEIPT",
+                "SALE",
+                "RETURN",
+                "ADJUSTMENT",
+                "DAMAGE"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMovementListResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "მარაგის ცვლილებების ისტორია",
+        "tags": [
+          "admin/inventory"
+        ]
+      }
     }
   },
   "info": {
@@ -1205,6 +2071,727 @@
             }
           }
         }
+      },
+      "ChargerBrandResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "logo_key": {
+            "type": "string",
+            "nullable": true
+          },
+          "sort_order": {
+            "type": "number"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "model_count": {
+            "type": "number",
+            "description": "მოდელების რაოდენობა ამ ბრენდში"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "logo_key",
+          "sort_order",
+          "is_active",
+          "model_count",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "ChargerBrandListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChargerBrandResponse"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "page_size": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ]
+      },
+      "CreateChargerBrandDto": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "example": "wallbox"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "Wallbox",
+            "description": "ბრენდის სახელი — არ ითარგმნება"
+          },
+          "logo_key": {
+            "type": "object",
+            "nullable": true,
+            "description": "ლოგოს გასაღები S3-ში"
+          },
+          "sort_order": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0
+          },
+          "is_active": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "slug",
+          "name"
+        ]
+      },
+      "UpdateChargerBrandDto": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "example": "wallbox"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "Wallbox",
+            "description": "ბრენდის სახელი — არ ითარგმნება"
+          },
+          "logo_key": {
+            "type": "object",
+            "nullable": true,
+            "description": "ლოგოს გასაღები S3-ში"
+          },
+          "sort_order": {
+            "type": "number",
+            "default": 0,
+            "minimum": 0
+          },
+          "is_active": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "ChargerModelResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "brand_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "brand_slug": {
+            "type": "string"
+          },
+          "brand_name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "string",
+            "nullable": true
+          },
+          "power_kw": {
+            "type": "number",
+            "nullable": true
+          },
+          "image_key": {
+            "type": "string",
+            "nullable": true
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "product_count": {
+            "type": "number",
+            "description": "ამ მოდელზე მიბმული პროდუქტების რაოდენობა"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "brand_id",
+          "brand_slug",
+          "brand_name",
+          "slug",
+          "name",
+          "revision",
+          "power_kw",
+          "image_key",
+          "is_active",
+          "product_count",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "ChargerModelListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChargerModelResponse"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "page_size": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ]
+      },
+      "CreateChargerModelDto": {
+        "type": "object",
+        "properties": {
+          "brand_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "example": "pulsar-plus",
+            "description": "უნიკალურია ბრენდის შიგნით"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "Pulsar Plus"
+          },
+          "revision": {
+            "type": "object",
+            "nullable": true,
+            "maxLength": 100,
+            "description": "ვერსია / რევიზია / თაობა",
+            "example": "Gen 2"
+          },
+          "power_kw": {
+            "type": "object",
+            "nullable": true,
+            "maximum": 9999.99,
+            "description": "სიმძლავრე kW-ში, ორი ათწილადით",
+            "example": 22
+          },
+          "image_key": {
+            "type": "object",
+            "nullable": true,
+            "description": "სურათის გასაღები S3-ში"
+          },
+          "is_active": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "brand_id",
+          "slug",
+          "name"
+        ]
+      },
+      "UpdateChargerModelDto": {
+        "type": "object",
+        "properties": {
+          "brand_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "example": "pulsar-plus",
+            "description": "უნიკალურია ბრენდის შიგნით"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "example": "Pulsar Plus"
+          },
+          "revision": {
+            "type": "object",
+            "nullable": true,
+            "maxLength": 100,
+            "description": "ვერსია / რევიზია / თაობა",
+            "example": "Gen 2"
+          },
+          "power_kw": {
+            "type": "object",
+            "nullable": true,
+            "maximum": 9999.99,
+            "description": "სიმძლავრე kW-ში, ორი ათწილადით",
+            "example": 22
+          },
+          "image_key": {
+            "type": "object",
+            "nullable": true,
+            "description": "სურათის გასაღები S3-ში"
+          },
+          "is_active": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "AttachProductsDto": {
+        "type": "object",
+        "properties": {
+          "product_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "product_ids"
+        ]
+      },
+      "ProductSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "ACTIVE",
+              "ARCHIVED"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "სახელი `ka`-ზე (ან პირველი არსებული)"
+          }
+        },
+        "required": [
+          "id",
+          "sku",
+          "slug",
+          "status",
+          "name"
+        ]
+      },
+      "AttachProductsResponse": {
+        "type": "object",
+        "properties": {
+          "charger_model_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "added": {
+            "type": "number",
+            "description": "რამდენი ახალი კავშირი დაემატა"
+          },
+          "skipped": {
+            "type": "number",
+            "description": "რამდენი კავშირი უკვე არსებობდა"
+          },
+          "total": {
+            "type": "number",
+            "description": "კავშირების ჯამური რაოდენობა ამ მოდელზე"
+          },
+          "products": {
+            "description": "მოთხოვნაში გადმოცემული პროდუქტები",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductSummaryResponse"
+            }
+          }
+        },
+        "required": [
+          "charger_model_id",
+          "added",
+          "skipped",
+          "total",
+          "products"
+        ]
+      },
+      "CompatibleModelResponse": {
+        "type": "object",
+        "properties": {
+          "charger_model_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "brand_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "brand_slug": {
+            "type": "string"
+          },
+          "brand_name": {
+            "type": "string"
+          },
+          "model_slug": {
+            "type": "string"
+          },
+          "model_name": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "string",
+            "nullable": true
+          },
+          "power_kw": {
+            "type": "number",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true,
+            "description": "შენიშვნა კავშირზე, მაგ. „მხოლოდ 2023 წლის შემდეგ“"
+          }
+        },
+        "required": [
+          "charger_model_id",
+          "brand_id",
+          "brand_slug",
+          "brand_name",
+          "model_slug",
+          "model_name",
+          "revision",
+          "power_kw",
+          "note"
+        ]
+      },
+      "ProductCompatibilityResponse": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "is_universal": {
+            "type": "boolean",
+            "description": "ერგება ყველა დამტენის მოდელს"
+          },
+          "models": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompatibleModelResponse"
+            }
+          }
+        },
+        "required": [
+          "product_id",
+          "is_universal",
+          "models"
+        ]
+      },
+      "SetProductCompatibilityDto": {
+        "type": "object",
+        "properties": {
+          "model_ids": {
+            "description": "დამტენის მოდელების სრული სია; `[]` — ყველა კავშირი იშლება",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "is_universal": {
+            "type": "boolean",
+            "description": "ერგება ყველა მოდელს. `true`-ზე `model_ids` აზრს კარგავს, მაგრამ ინახება."
+          }
+        },
+        "required": [
+          "model_ids"
+        ]
+      },
+      "InventoryItemResponse": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "product": {
+            "nullable": true,
+            "description": "პროდუქტის მოკლე აღწერა; `null` — თუ პროდუქტი წაშლილია",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProductSummaryResponse"
+              }
+            ]
+          },
+          "on_hand": {
+            "type": "number",
+            "description": "საწყობში ფიზიკურად არსებული რაოდენობა"
+          },
+          "reserved": {
+            "type": "number",
+            "description": "გადაუხდელი შეკვეთებით დაკავებული"
+          },
+          "available": {
+            "type": "number",
+            "description": "გასაყიდად ხელმისაწვდომი: `on_hand - reserved`"
+          },
+          "low_stock_threshold": {
+            "type": "number"
+          },
+          "is_low_stock": {
+            "type": "boolean",
+            "description": "`available <= low_stock_threshold`"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "product_id",
+          "product",
+          "on_hand",
+          "reserved",
+          "available",
+          "low_stock_threshold",
+          "is_low_stock",
+          "updated_at"
+        ]
+      },
+      "InventoryListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryItemResponse"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "page_size": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ]
+      },
+      "UpdateInventorySettingsDto": {
+        "type": "object",
+        "properties": {
+          "low_stock_threshold": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100000,
+            "description": "ზღვარი, რომლის ქვემოთ მარაგი „ცოტაა“ — ადმინკის გამაფრთხილებელი ნიშნისთვის",
+            "example": 2
+          }
+        },
+        "required": [
+          "low_stock_threshold"
+        ]
+      },
+      "CreateStockMovementDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "RECEIPT",
+              "SALE",
+              "RETURN",
+              "ADJUSTMENT",
+              "DAMAGE"
+            ]
+          },
+          "quantity": {
+            "type": "number",
+            "description": "ცვლილება ნიშნით: `+` ზრდის, `−` ამცირებს. ნული დაუშვებელია. ნიშანი უნდა ემთხვეოდეს ტიპს: RECEIPT/RETURN — `+`, SALE/DAMAGE — `−`, ADJUSTMENT — ორივე.",
+            "minimum": -1000000,
+            "maximum": 1000000,
+            "example": 10
+          },
+          "reason": {
+            "type": "object",
+            "nullable": true,
+            "maxLength": 500,
+            "description": "მიზეზი / კომენტარი — რჩება ისტორიაში"
+          }
+        },
+        "required": [
+          "type",
+          "quantity"
+        ]
+      },
+      "StockMovementResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "product_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "RECEIPT",
+              "SALE",
+              "RETURN",
+              "ADJUSTMENT",
+              "DAMAGE"
+            ]
+          },
+          "quantity": {
+            "type": "number",
+            "description": "ცვლილება ნიშნით"
+          },
+          "order_id": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "description": "შეკვეთა, რომელმაც ცვლილება გამოიწვია (ავტომატურ ჩანაწერებზე)"
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true
+          },
+          "actor_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "ადმინის Identity id (`sub`); `null` — სისტემური ჩანაწერი"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "product_id",
+          "type",
+          "quantity",
+          "order_id",
+          "reason",
+          "actor_id",
+          "created_at"
+        ]
+      },
+      "StockMovementResultResponse": {
+        "type": "object",
+        "properties": {
+          "movement": {
+            "$ref": "#/components/schemas/StockMovementResponse"
+          },
+          "inventory": {
+            "$ref": "#/components/schemas/InventoryItemResponse"
+          }
+        },
+        "required": [
+          "movement",
+          "inventory"
+        ]
+      },
+      "StockMovementListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StockMovementResponse"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "page_size": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ]
       }
     }
   }

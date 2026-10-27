@@ -99,6 +99,8 @@ prisma/
 - ✅ ლოკალური გარემო გამართულია: მიგრაციები (`init`, `inventory_checks`) რეპოშია და გამოყენებულია, seed გარბის, API ადგება.
 - ✅ `catalog` მოდული — ადმინის endpoint-ები: `/v1/admin/categories` (CRUD), `/v1/admin/products` (სია, შექმნა, ცვლილება, არქივი).
 - ✅ `auth` მოდული — `AdminGuard` + `@Roles()`. **JWT/JWKS ჯერ არ არის**: dev-ში როლები `DEV_ADMIN_ROLES`/`X-Dev-Roles`-იდან, სხვაგან `503 AUTH_NOT_CONFIGURED` (README → „ადმინის endpoint-ები და ავტორიზაცია“).
-- ⏭ შემდეგი: `compatibility` და `inventory` მოდულები ადმინკისთვის, შემდეგ საჯარო `/v1/catalog/...`.
+- ✅ `compatibility` მოდული — `/v1/admin/charger-brands` (CRUD), `/v1/admin/charger-models` (CRUD + `{id}/products` მიბმა/მოხსნა), `/v1/admin/products/{id}/compatibility` (GET/PUT).
+- ✅ `inventory` მოდული — `/v1/admin/inventory` (სია, `low_stock`), `/v1/admin/inventory/{product_id}` (GET/PATCH ზღვარი), `{product_id}/movements` (POST/GET). ცვლილება ერთ ტრანზაქციაში, `UPDATE ... WHERE on_hand + qty >= reserved`.
+- ⏭ შემდეგი: საჯარო `/v1/catalog/...` და `/v1/compatibility/...` (ფასეტები, თავსებადობის ფილტრი), პროდუქტის სურათები (S3), staging-ზე deploy.
 - ⚠️ გადასაწყვეტია: MinIO-ს ჩანაცვლება ლოკალური S3-ისთვის (README → „ცნობილი პრობლემები“). საჭირო ხდება ეტაპ 1-ზე, სურათების ატვირთვისას.
 - სამუშაოს დასრულებისას განაახლე `../icomers/PROJECT.md` (§1, §2, §7).
