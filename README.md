@@ -272,3 +272,5 @@ prisma/
 | `migrate` | release | `node_modules/.bin/prisma migrate deploy` |
 
 საჭირო env: `DATABASE_URL` (Postgres addon), `NODE_ENV=production`, `SWAGGER_ENABLED` (production-ში `false`), `CORS_ORIGINS`.
+
+**ბრენჩები:** `develop` → staging, **`master`** → production. გუნდის კონვენციით მთავარი ბრენჩი ყველა პროექტზე `master`-ია (არა `main`) — ამაზეა მორგებული CI (`.github/workflows/ci.yml`) და deploy.
