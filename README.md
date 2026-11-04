@@ -288,12 +288,33 @@ prisma/
 
 ## Deploy (usectl)
 
-ერთი `Dockerfile`, სამი აპი:
+**staging (2026-11-04):** Machine `ev-shop-docs`, pod **`icomers-api`** — private (გარედან პირდაპირ არ ჩანს),
+ხელმისაწვდომია მხოლოდ ადმინკის nginx-ით: https://icomers-admin.usectl.com/api/... . auto-deploy: push `master`-ზე.
 
-| აპი | ტიპი | ბრძანება |
-|---|---|---|
-| `api` | web | ნაგულისხმევი (`node dist/main.js`), port 4000 |
-| `worker` | worker | `node dist/worker.js` |
-| `migrate` | release | `node_modules/.bin/prisma migrate deploy` |
+ერთი `Dockerfile`. ნაგულისხმევი ბრძანება — `scripts/start.sh`:
 
-საჭირო env: `DATABASE_URL` (Postgres addon), `NODE_ENV=production`, `SWAGGER_ENABLED` (production-ში `false`), `CORS_ORIGINS`.
+1. `prisma migrate deploy` (გამოტოვება: `RUN_MIGRATIONS=false`)
+2. superadmin, თუ `SEED_SUPERADMIN_EMAIL` + `SEED_SUPERADMIN_PASSWORD` მითითებულია (არსებულის პაროლს არ ცვლის)
+3. `node dist/main.js`, port 4000
+
+worker-ისთვის (მომავალში): იგივე image, ბრძანება `node dist/worker.js`, `RUN_MIGRATIONS=false`.
+
+| env | საიდან |
+|---|---|
+| `DATABASE_URL` | Postgres addon (pod-ზე **attach** უნდა იყოს) — ხელით არ იწერება |
+| `S3_*`, `AWS_*` | S3 addon (attach) |
+| `JWT_PRIVATE_KEY` | **საიდუმლო**, protected. `openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256` |
+| `SEED_SUPERADMIN_EMAIL` / `SEED_SUPERADMIN_PASSWORD` | პირველი superadmin. პაროლი — **საიდუმლო** |
+| `JWT_ISSUER`, `JWT_AUDIENCE` | `https://<ადმინკის დომენი>/api`, `icomers-admin` |
+| `TRUST_PROXY_HOPS` | `2` (Traefik → ადმინკის nginx) |
+| `SWAGGER_ENABLED`, `LOG_LEVEL` | staging: `true`, `info` |
+
+`NODE_ENV=production` Dockerfile-შია. `CORS_ORIGINS` არ სჭირდება — ბრაუზერი API-ს ადმინკის დომენიდან (`/api`) იძახებს.
+
+Swagger staging-ზე: https://icomers-admin.usectl.com/api/docs . პაროლის აღდგენა: pod → Terminal →
+`node dist/scripts/set-admin-password.js <email>` (იხ. „ადმინის endpoint-ები და ავტორიზაცია“).
+
+**გაკვეთილები პირველი deploy-იდან:**
+- `prisma generate` Docker-ში `tsconfig.json`-მდე ეშვება → `schema.prisma`-ში `importFileExtension = "js"` სავალდებულოა.
+- usectl-ზე ყოველი pod ნაგულისხმევად 1 GiB ephemeral storage-ს ითხოვს — Machine-ის storage pod-ების რაოდენობაზე უნდა გათვალო.
+- დომენი ერთდონიანი უნდა იყოს (`icomers-admin.usectl.com`): Cloudflare-ის SSL სამდონიანს არ ფარავს.
