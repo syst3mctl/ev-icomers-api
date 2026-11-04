@@ -37,6 +37,7 @@ export class CreateChargerBrandDto {
   name!: string;
 
   @ApiPropertyOptional({
+    type: String,
     nullable: true,
     description: 'ლოგოს გასაღები S3-ში',
   })

@@ -40,24 +40,24 @@ export class ProductTranslationDto {
   @MaxLength(300)
   name!: string;
 
-  @ApiPropertyOptional({ nullable: true, maxLength: 500 })
+  @ApiPropertyOptional({ type: String, nullable: true, maxLength: 500 })
   @IsOptional()
   @IsString()
   @MaxLength(500)
   short_description?: string | null;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   @IsOptional()
   @IsString()
   description?: string | null;
 
-  @ApiPropertyOptional({ nullable: true, maxLength: 200 })
+  @ApiPropertyOptional({ type: String, nullable: true, maxLength: 200 })
   @IsOptional()
   @IsString()
   @MaxLength(200)
   seo_title?: string | null;
 
-  @ApiPropertyOptional({ nullable: true, maxLength: 500 })
+  @ApiPropertyOptional({ type: String, nullable: true, maxLength: 500 })
   @IsOptional()
   @IsString()
   @MaxLength(500)
@@ -106,6 +106,7 @@ export class CreateProductDto {
   price_minor!: number;
 
   @ApiPropertyOptional({
+    type: Number,
     nullable: true,
     minimum: 0,
     description: 'გადახაზული „ძველი ფასი“ თეთრებში',
@@ -158,7 +159,7 @@ export class CreateProductDto {
   @IsBoolean()
   is_featured?: boolean;
 
-  @ApiPropertyOptional({ nullable: true, minimum: 0 })
+  @ApiPropertyOptional({ type: Number, nullable: true, minimum: 0 })
   @IsOptional()
   @IsInt()
   @Min(0)

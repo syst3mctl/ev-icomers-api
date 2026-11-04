@@ -47,6 +47,7 @@ export class CreateChargerModelDto {
   name!: string;
 
   @ApiPropertyOptional({
+    type: String,
     nullable: true,
     maxLength: 100,
     description: 'ვერსია / რევიზია / თაობა',
@@ -58,6 +59,7 @@ export class CreateChargerModelDto {
   revision?: string | null;
 
   @ApiPropertyOptional({
+    type: Number,
     nullable: true,
     maximum: MAX_POWER_KW,
     description: 'სიმძლავრე kW-ში, ორი ათწილადით',
@@ -71,6 +73,7 @@ export class CreateChargerModelDto {
   power_kw?: number | null;
 
   @ApiPropertyOptional({
+    type: String,
     nullable: true,
     description: 'სურათის გასაღები S3-ში',
   })

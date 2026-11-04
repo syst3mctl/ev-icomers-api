@@ -2177,16 +2177,16 @@
             "example": "კაბელები"
           },
           "description": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "seo_title": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "maxLength": 200
           },
           "seo_description": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "maxLength": 500
           }
@@ -2205,7 +2205,7 @@
             "example": "cables"
           },
           "parent_id": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "format": "uuid",
             "description": "მშობელი კატეგორია; `null` — ზედა დონე"
@@ -2241,7 +2241,7 @@
             "example": "cables"
           },
           "parent_id": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "format": "uuid",
             "description": "მშობელი კატეგორია; `null` — ზედა დონე"
@@ -2556,21 +2556,21 @@
             "example": "Type 2 კაბელი 32A, 5მ"
           },
           "short_description": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "maxLength": 500
           },
           "description": {
-            "type": "object",
+            "type": "string",
             "nullable": true
           },
           "seo_title": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "maxLength": 200
           },
           "seo_description": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "maxLength": 500
           }
@@ -2613,7 +2613,7 @@
             "example": 32900
           },
           "compare_at_price_minor": {
-            "type": "object",
+            "type": "number",
             "nullable": true,
             "minimum": 0,
             "description": "გადახაზული „ძველი ფასი“ თეთრებში"
@@ -2648,7 +2648,7 @@
             "default": false
           },
           "weight_g": {
-            "type": "object",
+            "type": "number",
             "nullable": true,
             "minimum": 0
           },
@@ -2701,7 +2701,7 @@
             "example": 32900
           },
           "compare_at_price_minor": {
-            "type": "object",
+            "type": "number",
             "nullable": true,
             "minimum": 0,
             "description": "გადახაზული „ძველი ფასი“ თეთრებში"
@@ -2736,7 +2736,7 @@
             "default": false
           },
           "weight_g": {
-            "type": "object",
+            "type": "number",
             "nullable": true,
             "minimum": 0
           },
@@ -2838,7 +2838,7 @@
             "description": "ბრენდის სახელი — არ ითარგმნება"
           },
           "logo_key": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "description": "ლოგოს გასაღები S3-ში"
           },
@@ -2872,7 +2872,7 @@
             "description": "ბრენდის სახელი — არ ითარგმნება"
           },
           "logo_key": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "description": "ლოგოს გასაღები S3-ში"
           },
@@ -2999,21 +2999,21 @@
             "example": "Pulsar Plus"
           },
           "revision": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "maxLength": 100,
             "description": "ვერსია / რევიზია / თაობა",
             "example": "Gen 2"
           },
           "power_kw": {
-            "type": "object",
+            "type": "number",
             "nullable": true,
             "maximum": 9999.99,
             "description": "სიმძლავრე kW-ში, ორი ათწილადით",
             "example": 22
           },
           "image_key": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "description": "სურათის გასაღები S3-ში"
           },
@@ -3047,21 +3047,21 @@
             "example": "Pulsar Plus"
           },
           "revision": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "maxLength": 100,
             "description": "ვერსია / რევიზია / თაობა",
             "example": "Gen 2"
           },
           "power_kw": {
-            "type": "object",
+            "type": "number",
             "nullable": true,
             "maximum": 9999.99,
             "description": "სიმძლავრე kW-ში, ორი ათწილადით",
             "example": 22
           },
           "image_key": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "description": "სურათის გასაღები S3-ში"
           },
@@ -3362,7 +3362,7 @@
             "example": 10
           },
           "reason": {
-            "type": "object",
+            "type": "string",
             "nullable": true,
             "maxLength": 500,
             "description": "მიზეზი / კომენტარი — რჩება ისტორიაში"

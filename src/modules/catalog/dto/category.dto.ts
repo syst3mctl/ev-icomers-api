@@ -35,18 +35,18 @@ export class CategoryTranslationDto {
   @MaxLength(200)
   name!: string;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   @IsOptional()
   @IsString()
   description?: string | null;
 
-  @ApiPropertyOptional({ nullable: true, maxLength: 200 })
+  @ApiPropertyOptional({ type: String, nullable: true, maxLength: 200 })
   @IsOptional()
   @IsString()
   @MaxLength(200)
   seo_title?: string | null;
 
-  @ApiPropertyOptional({ nullable: true, maxLength: 500 })
+  @ApiPropertyOptional({ type: String, nullable: true, maxLength: 500 })
   @IsOptional()
   @IsString()
   @MaxLength(500)
@@ -63,6 +63,7 @@ export class CreateCategoryDto {
   slug!: string;
 
   @ApiPropertyOptional({
+    type: String,
     nullable: true,
     format: 'uuid',
     description: 'მშობელი კატეგორია; `null` — ზედა დონე',

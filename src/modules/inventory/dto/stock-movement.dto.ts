@@ -55,6 +55,7 @@ export class CreateStockMovementDto {
   quantity!: number;
 
   @ApiPropertyOptional({
+    type: String,
     nullable: true,
     maxLength: 500,
     description: 'მიზეზი / კომენტარი — რჩება ისტორიაში',
