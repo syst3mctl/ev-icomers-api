@@ -308,11 +308,23 @@ worker-ისთვის (მომავალში): იგივე image, 
 | `JWT_ISSUER`, `JWT_AUDIENCE` | `https://<ადმინკის დომენი>/api`, `icomers-admin` |
 | `TRUST_PROXY_HOPS` | `2` (Traefik → ადმინკის nginx) |
 | `SWAGGER_ENABLED`, `LOG_LEVEL` | staging: `true`, `info` |
+| `CORS_ORIGINS` | staging: `http://localhost:3000,http://localhost:3001` (იხ. ქვემოთ) |
 
-`NODE_ENV=production` Dockerfile-შია. `CORS_ORIGINS` არ სჭირდება — ბრაუზერი API-ს ადმინკის დომენიდან (`/api`) იძახებს.
+`NODE_ENV=production` Dockerfile-შია.
+
+`CORS_ORIGINS` (staging): `http://localhost:3000,http://localhost:3001` — მხოლოდ ლოკალური frontend-ისთვის (3000)
+და ადმინკისთვის (3001), რომ ბრაუზერიდან staging-ის API-ს პირდაპირ მიმართვაზე CORS-ის შეცდომა არ ამოვარდეს.
+ადმინკის staging დომენს CORS არ სჭირდება (`/api` იმავე origin-ზეა). `*` არ შეიძლება (`credentials: true`).
+⚠️ ადმინკის **ლოგინი** სხვა origin-იდან მაინც არ იმუშავებს (`SameSite=Strict` cookie + CSRF-ის დაცვა) —
+ლოკალურ ადმინკას staging-თან `npm run dev:staging` აკავშირებს (Vite proxy, იხ. `ev-icomers-admin/README.md`).
+CORS ძირითადად საჯარო, ლოგინის გარეშე endpoint-ებისთვისაა (storefront-ის კატალოგი).
 
 Swagger staging-ზე: https://icomers-admin.usectl.com/api/docs . პაროლის აღდგენა: pod → Terminal →
 `node dist/scripts/set-admin-password.js <email>` (იხ. „ადმინის endpoint-ები და ავტორიზაცია“).
+
+**სატესტო მონაცემები staging-ზე** (იგივე, რაც ლოკალურად `pnpm db:seed`: 3 კატეგორია, დამტენის ბრენდები/მოდელები,
+3 პროდუქტი მარაგით): pod → Terminal → `node dist/scripts/seed-demo.js --yes`. განმეორებით გაშვება უსაფრთხოა
+(არსებულს არ ცვლის, დუბლიკატს არ ქმნის). მონაცემები `src/scripts/demo-data.ts`-შია. ⚠️ ნამდვილ production-ზე არა.
 
 **გაკვეთილები პირველი deploy-იდან:**
 - `prisma generate` Docker-ში `tsconfig.json`-მდე ეშვება → `schema.prisma`-ში `importFileExtension = "js"` სავალდებულოა.
