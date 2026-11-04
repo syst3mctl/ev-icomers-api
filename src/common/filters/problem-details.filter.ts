@@ -7,6 +7,10 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import {
+  isDatabaseUnavailable,
+  prismaErrorCode,
+} from '../../infra/prisma/prisma-errors.js';
 
 /**
  * ყველა შეცდომა ბრუნდება ერთი ფორმატით: application/problem+json.
@@ -58,7 +62,16 @@ export class ProblemDetailsFilter implements ExceptionFilter {
     const body = this.toProblem(exception);
     if (req?.id) body.trace_id = String(req.id);
 
-    if (!(exception instanceof HttpException)) {
+    if (body.code === 'DATABASE_UNAVAILABLE') {
+      // ბაზის გათიშვისას ყოველი მოთხოვნა ერთ შეცდომას აგდებს. სრული stack trace
+      // მხოლოდ იმ ფაილს აჩვენებს, საიდანაც query გავიდა — მიზეზს არა. ამიტომ ერთი
+      // სტრიქონი დრაივერის კოდით: ლოგი იკითხება და მიზეზიც ჩანს.
+      this.logger.warn(
+        `503 DATABASE_UNAVAILABLE (${prismaErrorCode(exception) ?? 'unknown'})`,
+      );
+      // 503-ს `Retry-After` სჭირდება (RFC 9110 §15.6.4) — ფრონტმა იცოდეს, რამდენში გაიმეოროს
+      res.setHeader('Retry-After', '5');
+    } else if (!(exception instanceof HttpException)) {
       this.logger.error(exception);
     } else if (body.status >= 500) {
       this.logger.warn(`${body.status} ${body.code}: ${body.detail ?? ''}`);
@@ -94,6 +107,20 @@ export class ProblemDetailsFilter implements ExceptionFilter {
         code,
         detail: Array.isArray(message) ? message.join('; ') : String(message),
         ...(Array.isArray(message) ? { errors: message } : {}),
+      };
+    }
+
+    // ბაზა მიუწვდომელია — ეს ინფრასტრუქტურის და არა მოთხოვნის პრობლემაა. ფრონტი
+    // `code`-ით ხვდება, რომ უნდა აჩვენოს „დროებით მიუწვდომელია“ და არა ზოგადი
+    // შეცდომა, ხოლო მოთხოვნის გამეორებას აზრი აქვს. Prisma-ს `detail` არ გადმოგვაქვს:
+    // ის შეიცავს კოდის გზას და SQL-ის ფრაგმენტს.
+    if (isDatabaseUnavailable(exception)) {
+      return {
+        type: 'about:blank#database_unavailable',
+        title: 'DATABASE_UNAVAILABLE',
+        status: HttpStatus.SERVICE_UNAVAILABLE,
+        code: 'DATABASE_UNAVAILABLE',
+        detail: 'The database is temporarily unavailable. Try again shortly.',
       };
     }
 
