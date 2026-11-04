@@ -3,8 +3,12 @@
 // დრო timestamptz (UTC). დეტალურად: docs/04-data-model.md (დოკუმენტაციის რეპო).
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  // ცალსახად: Docker-ში `prisma generate` tsconfig.json-ის კოპირებამდე ეშვება და მის გარეშე
+  // Prisma import-ებს `.ts` გაფართოებით წერს → production-ში `node dist/...` ვერ პოულობს მოდულს.
+  moduleFormat        = "esm"
+  importFileExtension = "js"
 }
 
 datasource db {
