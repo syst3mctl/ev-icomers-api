@@ -12,6 +12,7 @@ import { CatalogModule } from './modules/catalog/catalog.module.js';
 import { CompatibilityModule } from './modules/compatibility/compatibility.module.js';
 import { HealthModule } from './modules/health/health.module.js';
 import { InventoryModule } from './modules/inventory/inventory.module.js';
+import { StorefrontModule } from './modules/storefront/storefront.module.js';
 
 /**
  * მოდულები (docs/02-architecture.md §3). ახალი მოდული ემატება `modules/`-ში და აქ imports-ში:
@@ -50,6 +51,7 @@ import { InventoryModule } from './modules/inventory/inventory.module.js';
     CatalogModule,
     CompatibilityModule,
     InventoryModule,
+    StorefrontModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: ProblemDetailsFilter }],
 })

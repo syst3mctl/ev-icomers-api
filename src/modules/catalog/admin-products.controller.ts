@@ -26,9 +26,10 @@ import {
   UpdateProductDto,
 } from './dto/product.dto.js';
 import { ProductsService } from './products.service.js';
+import { TAGS } from '../../openapi-tags.js';
 
 /** docs/05-api.md §4 → „კატალოგი“: `/admin/products` (editor+) */
-@ApiTags('admin/catalog')
+@ApiTags(TAGS.adminCatalog)
 @ApiBearerAuth()
 @Controller('admin/products')
 @UseGuards(AdminGuard)

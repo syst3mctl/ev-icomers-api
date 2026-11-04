@@ -29,9 +29,10 @@ import {
   ListChargerBrandsQueryDto,
   UpdateChargerBrandDto,
 } from './dto/charger-brand.dto.js';
+import { TAGS } from '../../openapi-tags.js';
 
 /** docs/05-api.md §4 → „კატალოგი“: `/admin/charger-brands` (editor+) */
-@ApiTags('admin/compatibility')
+@ApiTags(TAGS.adminCompatibility)
 @ApiBearerAuth()
 @Controller('admin/charger-brands')
 @UseGuards(AdminGuard)

@@ -29,9 +29,10 @@ import {
 } from './dto/admin-user.dto.js';
 import { AdminUserResponse } from './dto/auth.dto.js';
 import { Roles } from './roles.js';
+import { TAGS } from '../../openapi-tags.js';
 
 /** ადმინკის მომხმარებლები — მხოლოდ superadmin */
-@ApiTags('admin/users')
+@ApiTags(TAGS.adminUsers)
 @ApiBearerAuth()
 @ApiCookieAuth()
 @Controller('admin/users')

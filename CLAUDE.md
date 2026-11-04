@@ -52,7 +52,9 @@ src/
   config/env.ts           env ცვლადები (zod) — ახალი ცვლადი აქ + .env.example
   common/filters/         problem+json შეცდომები, AppError
   infra/prisma/           PrismaService (global)
+  openapi-tags.ts         Swagger-ის ჯგუფები და მათი რიგი
   modules/<name>/         ბიზნეს-მოდულები: controller, service, dto/, *.spec.ts
+  modules/storefront/     საჯარო API საიტისთვის (კითხულობს catalog / compatibility / inventory service-ებით)
   worker/                 Worker-ის მოდულები
   generated/prisma/       Prisma client (გენერირებული, git-ში არ არის)
 prisma/
@@ -69,7 +71,8 @@ prisma/
 - **მოდულები:** მოდული სხვა მოდულის ცხრილებს პირდაპირ არ ეხება — მხოლოდ მისი service-ით. ასე საჭიროებისას მოდული ცალკე სერვისად გამოიყოფა.
 - **Controller-ები თხელია**, ლოგიკა service-შია.
 - **DTO-ები** `snake_case` ველებით, `class-validator`-ით და `@ApiProperty`-ით (რომ `openapi.json` სრული იყოს). Response-ებისთვისაც DTO/კლასი, რომ ფრონტმა ზუსტი ტიპი მიიღოს.
-- **Route-ები** ავტომატურად `/v1/...`. Admin endpoint-ები: `/v1/admin/...`.
+- **Route-ები** ავტომატურად `/v1/...`. Admin endpoint-ები: `/v1/admin/...`. საჯარო (საიტისთვის) — `storefront` მოდულში, ავტორიზაციის გარეშე, მხოლოდ აქტიური ჩანაწერები.
+- **Swagger-ის ჯგუფი:** `@ApiTags(TAGS.…)` (`src/openapi-tags.ts`), არასდროს ტექსტით — ახალი ჯგუფი ჯერ იქ ემატება (აღწერით).
 - **შეცდომები:** ბიზნეს-შეცდომა `throw new AppError(status, 'CODE', 'detail')`. `code` მუდმივია და `UPPER_SNAKE_CASE`.
 - **ფული:** მხოლოდ `Int`, თეთრებში, ველის სახელი `*_minor`.
 - **მარაგი** იცვლება მხოლოდ ტრანზაქციაში (`prisma.$transaction`), შეკვეთასთან ერთად; დაჯავშნა ერთი `UPDATE ... WHERE on_hand - reserved >= qty`-ით (`docs/04-data-model.md` §4).
@@ -108,5 +111,6 @@ prisma/
 - ✅ `inventory` მოდული — `/v1/admin/inventory` (სია, `low_stock`), `/v1/admin/inventory/{product_id}` (GET/PATCH ზღვარი), `{product_id}/movements` (POST/GET). ცვლილება ერთ ტრანზაქციაში, `UPDATE ... WHERE on_hand + qty >= reserved`.
 - ✅ პროდუქტის სურათები (2026-11-04): `POST/DELETE /v1/admin/products/{id}/images`, `PUT .../images/order`, საჯარო `GET /v1/media/...`. S3 staging-ზე, ლოკალურად დისკი (README → „პროდუქტის სურათები“). presigned URL-ის ნაცვლად — ატვირთვა API-ზე (usectl-ის S3 ბრაუზერისთვის მიუწვდომელია).
 - ✅ staging-ზე deploy (usectl). სატესტო მონაცემები: `node dist/scripts/seed-demo.js --yes`.
-- ⏭ შემდეგი: საჯარო `/v1/catalog/...` და `/v1/compatibility/...` (ფასეტები, თავსებადობის ფილტრი).
+- ✅ საჯარო API (2026-11-04, `storefront` მოდული): `/v1/catalog/categories|products|products/{slug}|.../related`, `/v1/compatibility/brands|models`, `/v1/search/suggest` (README → „საჯარო API“).
+- ⏭ შემდეგი: `GET /v1/catalog/filters` (ფასეტები რაოდენობებით), `attr[...]` ფილტრი; მერე კალათა / checkout.
 - სამუშაოს დასრულებისას განაახლე `../icomers/PROJECT.md` (§1, §2, §7).

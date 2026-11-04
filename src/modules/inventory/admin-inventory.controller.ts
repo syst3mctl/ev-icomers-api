@@ -33,9 +33,10 @@ import {
   StockMovementResultResponse,
 } from './dto/stock-movement.dto.js';
 import { InventoryService } from './inventory.service.js';
+import { TAGS } from '../../openapi-tags.js';
 
 /** docs/05-api.md §4 → „მარაგი“: `/admin/inventory` (warehouse+) */
-@ApiTags('admin/inventory')
+@ApiTags(TAGS.adminInventory)
 @ApiBearerAuth()
 @Controller('admin/inventory')
 @UseGuards(AdminGuard)

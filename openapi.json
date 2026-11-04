@@ -255,7 +255,7 @@
         ],
         "summary": "მომხმარებლების სია",
         "tags": [
-          "admin/users"
+          "admin · users"
         ]
       },
       "post": {
@@ -294,7 +294,7 @@
         ],
         "summary": "ახალი მომხმარებლის რეგისტრაცია",
         "tags": [
-          "admin/users"
+          "admin · users"
         ]
       }
     },
@@ -333,7 +333,7 @@
         ],
         "summary": "ერთი მომხმარებელი",
         "tags": [
-          "admin/users"
+          "admin · users"
         ]
       },
       "patch": {
@@ -381,7 +381,7 @@
         ],
         "summary": "მომხმარებლის შეცვლა: სახელი, როლები, გათიშვა, ახალი პაროლი",
         "tags": [
-          "admin/users"
+          "admin · users"
         ]
       }
     },
@@ -472,7 +472,7 @@
         ],
         "summary": "კატეგორიების სია",
         "tags": [
-          "admin/catalog"
+          "admin · catalog"
         ]
       },
       "post": {
@@ -507,7 +507,7 @@
         ],
         "summary": "ახალი კატეგორია",
         "tags": [
-          "admin/catalog"
+          "admin · catalog"
         ]
       }
     },
@@ -543,7 +543,7 @@
         ],
         "summary": "ერთი კატეგორია",
         "tags": [
-          "admin/catalog"
+          "admin · catalog"
         ]
       },
       "patch": {
@@ -587,7 +587,7 @@
         ],
         "summary": "კატეგორიის შეცვლა",
         "tags": [
-          "admin/catalog"
+          "admin · catalog"
         ]
       },
       "delete": {
@@ -615,7 +615,7 @@
         ],
         "summary": "კატეგორიის წაშლა",
         "tags": [
-          "admin/catalog"
+          "admin · catalog"
         ]
       }
     },
@@ -712,7 +712,7 @@
         ],
         "summary": "პროდუქტების სია ფილტრებით",
         "tags": [
-          "admin/catalog"
+          "admin · catalog"
         ]
       },
       "post": {
@@ -747,7 +747,7 @@
         ],
         "summary": "ახალი პროდუქტი",
         "tags": [
-          "admin/catalog"
+          "admin · catalog"
         ]
       }
     },
@@ -783,7 +783,7 @@
         ],
         "summary": "ერთი პროდუქტი: თარგმანები და სურათები",
         "tags": [
-          "admin/catalog"
+          "admin · catalog"
         ]
       },
       "patch": {
@@ -827,7 +827,7 @@
         ],
         "summary": "პროდუქტის შეცვლა",
         "tags": [
-          "admin/catalog"
+          "admin · catalog"
         ]
       }
     },
@@ -864,7 +864,7 @@
         ],
         "summary": "არქივში გადატანა",
         "tags": [
-          "admin/catalog"
+          "admin · catalog"
         ]
       }
     },
@@ -911,7 +911,7 @@
         ],
         "summary": "სურათის ატვირთვა",
         "tags": [
-          "admin/catalog"
+          "admin · catalog"
         ]
       }
     },
@@ -960,7 +960,7 @@
         ],
         "summary": "სურათების რიგის შეცვლა (პირველი — მთავარი)",
         "tags": [
-          "admin/catalog"
+          "admin · catalog"
         ]
       }
     },
@@ -997,7 +997,7 @@
         ],
         "summary": "სურათის წაშლა (ბაზიდანაც და საცავიდანაც)",
         "tags": [
-          "admin/catalog"
+          "admin · catalog"
         ]
       }
     },
@@ -1049,7 +1049,7 @@
         },
         "summary": "პროდუქტის სურათი",
         "tags": [
-          "media"
+          "public · media"
         ]
       }
     },
@@ -1116,7 +1116,7 @@
         ],
         "summary": "დამტენის ბრენდების სია",
         "tags": [
-          "admin/compatibility"
+          "admin · compatibility"
         ]
       },
       "post": {
@@ -1151,7 +1151,7 @@
         ],
         "summary": "ახალი ბრენდი",
         "tags": [
-          "admin/compatibility"
+          "admin · compatibility"
         ]
       }
     },
@@ -1187,7 +1187,7 @@
         ],
         "summary": "ერთი ბრენდი",
         "tags": [
-          "admin/compatibility"
+          "admin · compatibility"
         ]
       },
       "patch": {
@@ -1231,7 +1231,7 @@
         ],
         "summary": "ბრენდის შეცვლა",
         "tags": [
-          "admin/compatibility"
+          "admin · compatibility"
         ]
       },
       "delete": {
@@ -1259,7 +1259,7 @@
         ],
         "summary": "ბრენდის წაშლა",
         "tags": [
-          "admin/compatibility"
+          "admin · compatibility"
         ]
       }
     },
@@ -1336,7 +1336,7 @@
         ],
         "summary": "დამტენის მოდელების სია",
         "tags": [
-          "admin/compatibility"
+          "admin · compatibility"
         ]
       },
       "post": {
@@ -1371,7 +1371,7 @@
         ],
         "summary": "ახალი მოდელი",
         "tags": [
-          "admin/compatibility"
+          "admin · compatibility"
         ]
       }
     },
@@ -1407,7 +1407,7 @@
         ],
         "summary": "ერთი მოდელი",
         "tags": [
-          "admin/compatibility"
+          "admin · compatibility"
         ]
       },
       "patch": {
@@ -1451,7 +1451,7 @@
         ],
         "summary": "მოდელის შეცვლა",
         "tags": [
-          "admin/compatibility"
+          "admin · compatibility"
         ]
       },
       "delete": {
@@ -1479,7 +1479,7 @@
         ],
         "summary": "მოდელის წაშლა",
         "tags": [
-          "admin/compatibility"
+          "admin · compatibility"
         ]
       }
     },
@@ -1526,7 +1526,7 @@
         ],
         "summary": "ერთ მოდელზე ბევრი პროდუქტის მიბმა",
         "tags": [
-          "admin/compatibility"
+          "admin · compatibility"
         ]
       }
     },
@@ -1563,7 +1563,7 @@
         ],
         "summary": "ერთი პროდუქტის მოხსნა მოდელიდან",
         "tags": [
-          "admin/compatibility"
+          "admin · compatibility"
         ]
       }
     },
@@ -1599,7 +1599,7 @@
         ],
         "summary": "პროდუქტის თავსებადი დამტენის მოდელები",
         "tags": [
-          "admin/compatibility"
+          "admin · compatibility"
         ]
       },
       "put": {
@@ -1644,7 +1644,7 @@
         ],
         "summary": "თავსებადი მოდელების სიის ჩანაცვლება",
         "tags": [
-          "admin/compatibility"
+          "admin · compatibility"
         ]
       }
     },
@@ -1717,7 +1717,7 @@
         ],
         "summary": "მარაგის სია",
         "tags": [
-          "admin/inventory"
+          "admin · inventory"
         ]
       }
     },
@@ -1753,7 +1753,7 @@
         ],
         "summary": "ერთი პროდუქტის მარაგი",
         "tags": [
-          "admin/inventory"
+          "admin · inventory"
         ]
       },
       "patch": {
@@ -1798,7 +1798,7 @@
         ],
         "summary": "„ცოტა მარაგის“ ზღვრის შეცვლა",
         "tags": [
-          "admin/inventory"
+          "admin · inventory"
         ]
       }
     },
@@ -1845,7 +1845,7 @@
         ],
         "summary": "მარაგის ცვლილება (მიღება, კორექცია, დაზიანება…)",
         "tags": [
-          "admin/inventory"
+          "admin · inventory"
         ]
       },
       "get": {
@@ -1915,18 +1915,473 @@
         ],
         "summary": "მარაგის ცვლილებების ისტორია",
         "tags": [
-          "admin/inventory"
+          "admin · inventory"
+        ]
+      }
+    },
+    "/v1/catalog/categories": {
+      "get": {
+        "description": "მხოლოდ აქტიური კატეგორიები. გამორთული კატეგორიის ქვეკატეგორიებიც დამალულია.",
+        "operationId": "PublicCatalogController_categories_v1",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "ka",
+              "type": "string",
+              "enum": [
+                "ka",
+                "en"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicCategoryNode"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "კატეგორიების ხე",
+        "tags": [
+          "public · catalog"
+        ]
+      }
+    },
+    "/v1/catalog/products": {
+      "get": {
+        "description": "მხოლოდ `ACTIVE` პროდუქტები აქტიურ კატეგორიაში. ფილტრები ერთმანეთს ემატება (AND). `charger_model` / `charger_brand` — თავსებადი **და** უნივერსალური პროდუქტები. შეცდომები: `404 CATEGORY_NOT_FOUND`, `404 CHARGER_MODEL_NOT_FOUND`, `404 CHARGER_BRAND_NOT_FOUND`, `422 INVALID_PRICE_RANGE`.",
+        "operationId": "PublicCatalogController_products_v1",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "ka",
+              "type": "string",
+              "enum": [
+                "ka",
+                "en"
+              ]
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "კატეგორიის slug; ქვეკატეგორიების პროდუქტებიც შედის",
+            "schema": {
+              "example": "cables",
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "ძებნა: სახელი, SKU, OEM ნომერი",
+            "schema": {
+              "example": "type 2",
+              "type": "string"
+            }
+          },
+          {
+            "name": "min_price",
+            "required": false,
+            "in": "query",
+            "description": "მინიმალური ფასი, თეთრებში",
+            "schema": {
+              "example": 10000,
+              "type": "number"
+            }
+          },
+          {
+            "name": "max_price",
+            "required": false,
+            "in": "query",
+            "description": "მაქსიმალური ფასი, თეთრებში",
+            "schema": {
+              "example": 50000,
+              "type": "number"
+            }
+          },
+          {
+            "name": "in_stock",
+            "required": false,
+            "in": "query",
+            "description": "`true` — მხოლოდ მარაგში არსებული",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "charger_model",
+            "required": false,
+            "in": "query",
+            "description": "დამტენის მოდელი: მხოლოდ მასთან თავსებადი **და** უნივერსალური პროდუქტები",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "charger_brand",
+            "required": false,
+            "in": "query",
+            "description": "დამტენის ბრენდის slug: ამ ბრენდის რომელიმე მოდელთან თავსებადი + უნივერსალური",
+            "schema": {
+              "example": "wallbox",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "`featured` — ჯერ რჩეულები, მერე ახლები",
+            "schema": {
+              "default": "featured",
+              "type": "string",
+              "enum": [
+                "featured",
+                "newest",
+                "price_asc",
+                "price_desc"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page_size",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 24,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicProductList"
+                }
+              }
+            }
+          }
+        },
+        "summary": "პროდუქტების სია ფილტრებით",
+        "tags": [
+          "public · catalog"
+        ]
+      }
+    },
+    "/v1/catalog/products/{slug}": {
+      "get": {
+        "description": "სურათები, მახასიათებლები, breadcrumbs, თავსებადი დამტენები, მარაგის სტატუსი. მონახაზი / არქივი / გამორთული კატეგორია → `404 PRODUCT_NOT_FOUND`.",
+        "operationId": "PublicCatalogController_product_v1",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "ka",
+              "type": "string",
+              "enum": [
+                "ka",
+                "en"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicProductDetail"
+                }
+              }
+            }
+          }
+        },
+        "summary": "ერთი პროდუქტი slug-ით",
+        "tags": [
+          "public · catalog"
+        ]
+      }
+    },
+    "/v1/catalog/products/{slug}/related": {
+      "get": {
+        "operationId": "PublicCatalogController_related_v1",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "ka",
+              "type": "string",
+              "enum": [
+                "ka",
+                "en"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicProductCard"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "მსგავსი პროდუქტები (იმავე კატეგორიიდან, მაქსიმუმ 8)",
+        "tags": [
+          "public · catalog"
+        ]
+      }
+    },
+    "/v1/compatibility/brands": {
+      "get": {
+        "operationId": "PublicCompatibilityController_brands_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicBrand"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "დამტენის ბრენდები (აქტიური)",
+        "tags": [
+          "public · compatibility"
+        ]
+      }
+    },
+    "/v1/compatibility/brands/{brand_slug}/models": {
+      "get": {
+        "description": "მოდელის `id` გადაეცემა `GET /v1/catalog/products?charger_model=<id>`-ს.",
+        "operationId": "PublicCompatibilityController_models_v1",
+        "parameters": [
+          {
+            "name": "brand_slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicChargerModel"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "ბრენდის მოდელები",
+        "tags": [
+          "public · compatibility"
+        ]
+      }
+    },
+    "/v1/compatibility/models/{id}": {
+      "get": {
+        "operationId": "PublicCompatibilityController_model_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicChargerModel"
+                }
+              }
+            }
+          }
+        },
+        "summary": "ერთი მოდელი (მაგ. შენახული დამტენის საჩვენებლად)",
+        "tags": [
+          "public · compatibility"
+        ]
+      }
+    },
+    "/v1/search/suggest": {
+      "get": {
+        "description": "მინიმუმ 2 სიმბოლო. 5 პროდუქტი, 3 კატეგორია, 5 დამტენის მოდელი. სრული შედეგები — `GET /v1/catalog/products?q=...`.",
+        "operationId": "PublicSearchController_suggest_v1",
+        "parameters": [
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "ka",
+              "type": "string",
+              "enum": [
+                "ka",
+                "en"
+              ]
+            }
+          },
+          {
+            "name": "q",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "minLength": 2,
+              "maxLength": 100,
+              "example": "type",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchSuggestResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "ავტოშევსება ძებნის ველისთვის",
+        "tags": [
+          "public · search"
         ]
       }
     }
   },
   "info": {
     "title": "icomers API",
-    "description": "icomers ონლაინ მაღაზიის REST API",
+    "description": "icomers ონლაინ მაღაზიის REST API.\n\n- **public · …** — საიტისთვის, ავტორიზაციის გარეშე\n- **admin · …** — ადმინკისთვის: ზემოთ **Authorize** → `POST /v1/auth/token`-ის `access_token`\n\nძებნა (ზედა ველი): ჯგუფის სახელი, მისამართი (`/catalog/products`), მეთოდი ან აღწერა.",
     "version": "1",
     "contact": {}
   },
-  "tags": [],
+  "tags": [
+    {
+      "name": "public · catalog",
+      "description": "🌐 **საჯარო, ლოგინის გარეშე** — საიტისთვის (storefront): მხოლოდ აქტიური კატეგორიები და პროდუქტები, მარაგი სტატუსით (ზუსტი რიცხვის გარეშე), ტექსტი ერთ ენაზე (`?locale=ka|en`)."
+    },
+    {
+      "name": "public · compatibility",
+      "description": "🌐 საჯარო — „აირჩიე შენი დამტენი“: ბრენდები და მოდელები."
+    },
+    {
+      "name": "public · search",
+      "description": "🌐 საჯარო — ძებნის ველის ავტოშევსება."
+    },
+    {
+      "name": "public · media",
+      "description": "🌐 საჯარო — პროდუქტის სურათები (`images[].url`)."
+    },
+    {
+      "name": "auth",
+      "description": "ადმინკის შესვლა / გასვლა, OAuth 2.0 ტოკენი, JWKS."
+    },
+    {
+      "name": "admin · catalog",
+      "description": "🔒 ადმინი — კატეგორიები, პროდუქტები, სურათები (როლები: content_editor, manager, admin)."
+    },
+    {
+      "name": "admin · compatibility",
+      "description": "🔒 ადმინი — დამტენის ბრენდები, მოდელები, პროდუქტების თავსებადობა."
+    },
+    {
+      "name": "admin · inventory",
+      "description": "🔒 ადმინი — მარაგი და მისი ისტორია (როლები: warehouse, manager, admin)."
+    },
+    {
+      "name": "admin · users",
+      "description": "🔒 ადმინი — ადმინკის მომხმარებლები (მხოლოდ superadmin)."
+    },
+    {
+      "name": "health",
+      "description": "Kubernetes / usectl-ის შემოწმება."
+    }
+  ],
   "servers": [],
   "components": {
     "securitySchemes": {
@@ -3710,6 +4165,488 @@
           "page",
           "page_size",
           "total"
+        ]
+      },
+      "PublicCategoryNode": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string",
+            "example": "cables"
+          },
+          "name": {
+            "type": "string",
+            "example": "კაბელები"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "product_count": {
+            "type": "number",
+            "description": "აქტიური პროდუქტები ამ კატეგორიაში (ქვეკატეგორიების გარეშე)"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicCategoryNode"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "description",
+          "product_count",
+          "children"
+        ]
+      },
+      "PublicImage": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "API-ს ფესვიდან: `/v1/media/...`",
+            "example": "/v1/media/products/…/….webp"
+          },
+          "alt": {
+            "type": "string",
+            "nullable": true,
+            "description": "alt ტექსტი მოთხოვნილ ენაზე"
+          },
+          "width": {
+            "type": "number",
+            "nullable": true
+          },
+          "height": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "url",
+          "alt",
+          "width",
+          "height"
+        ]
+      },
+      "PublicCategoryRef": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "example": "cables"
+          },
+          "name": {
+            "type": "string",
+            "example": "კაბელები"
+          }
+        },
+        "required": [
+          "slug",
+          "name"
+        ]
+      },
+      "PublicProductCard": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string",
+            "example": "type2-cable-32a-5m"
+          },
+          "sku": {
+            "type": "string",
+            "example": "CBL-T2-32-5"
+          },
+          "name": {
+            "type": "string",
+            "description": "მოთხოვნილ ენაზე; თარგმანი თუ არ არის — ქართულად"
+          },
+          "short_description": {
+            "type": "string",
+            "nullable": true
+          },
+          "price_minor": {
+            "type": "number",
+            "description": "ფასი თეთრებში, დღგ-ის ჩათვლით",
+            "example": 32900
+          },
+          "compare_at_price_minor": {
+            "type": "number",
+            "nullable": true,
+            "description": "გადახაზული ფასი (ფასდაკლება)"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "GEL"
+            ],
+            "example": "GEL"
+          },
+          "image": {
+            "nullable": true,
+            "description": "მთავარი სურათი",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicImage"
+              }
+            ]
+          },
+          "stock_status": {
+            "type": "string",
+            "enum": [
+              "IN_STOCK",
+              "LOW_STOCK",
+              "OUT_OF_STOCK"
+            ],
+            "description": "ზუსტი რაოდენობა საჯაროდ არ ჩანს. `LOW_STOCK` — ცოტა დარჩა"
+          },
+          "is_universal": {
+            "type": "boolean",
+            "description": "ერგება ყველა დამტენს"
+          },
+          "is_featured": {
+            "type": "boolean"
+          },
+          "category": {
+            "$ref": "#/components/schemas/PublicCategoryRef"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "sku",
+          "name",
+          "short_description",
+          "price_minor",
+          "compare_at_price_minor",
+          "currency",
+          "image",
+          "stock_status",
+          "is_universal",
+          "is_featured",
+          "category"
+        ]
+      },
+      "PublicProductList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicProductCard"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "page_size": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ]
+      },
+      "PublicBrandRef": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "example": "wallbox"
+          },
+          "name": {
+            "type": "string",
+            "example": "Wallbox"
+          }
+        },
+        "required": [
+          "slug",
+          "name"
+        ]
+      },
+      "PublicChargerModel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string",
+            "example": "pulsar-plus"
+          },
+          "name": {
+            "type": "string",
+            "example": "Pulsar Plus"
+          },
+          "revision": {
+            "type": "string",
+            "nullable": true
+          },
+          "power_kw": {
+            "type": "number",
+            "nullable": true,
+            "example": 22
+          },
+          "brand": {
+            "$ref": "#/components/schemas/PublicBrandRef"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "revision",
+          "power_kw",
+          "brand"
+        ]
+      },
+      "PublicProductDetail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string",
+            "example": "type2-cable-32a-5m"
+          },
+          "sku": {
+            "type": "string",
+            "example": "CBL-T2-32-5"
+          },
+          "name": {
+            "type": "string",
+            "description": "მოთხოვნილ ენაზე; თარგმანი თუ არ არის — ქართულად"
+          },
+          "short_description": {
+            "type": "string",
+            "nullable": true
+          },
+          "price_minor": {
+            "type": "number",
+            "description": "ფასი თეთრებში, დღგ-ის ჩათვლით",
+            "example": 32900
+          },
+          "compare_at_price_minor": {
+            "type": "number",
+            "nullable": true,
+            "description": "გადახაზული ფასი (ფასდაკლება)"
+          },
+          "currency": {
+            "type": "string",
+            "enum": [
+              "GEL"
+            ],
+            "example": "GEL"
+          },
+          "image": {
+            "nullable": true,
+            "description": "მთავარი სურათი",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicImage"
+              }
+            ]
+          },
+          "stock_status": {
+            "type": "string",
+            "enum": [
+              "IN_STOCK",
+              "LOW_STOCK",
+              "OUT_OF_STOCK"
+            ],
+            "description": "ზუსტი რაოდენობა საჯაროდ არ ჩანს. `LOW_STOCK` — ცოტა დარჩა"
+          },
+          "is_universal": {
+            "type": "boolean",
+            "description": "ერგება ყველა დამტენს"
+          },
+          "is_featured": {
+            "type": "boolean"
+          },
+          "category": {
+            "$ref": "#/components/schemas/PublicCategoryRef"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "seo_title": {
+            "type": "string",
+            "nullable": true
+          },
+          "seo_description": {
+            "type": "string",
+            "nullable": true
+          },
+          "images": {
+            "description": "ყველა სურათი რიგით; პირველი — მთავარი",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicImage"
+            }
+          },
+          "attributes": {
+            "type": "object",
+            "additionalProperties": true,
+            "example": {
+              "connector": "Type 2",
+              "current_a": 32
+            }
+          },
+          "oem_part_numbers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "weight_g": {
+            "type": "number",
+            "nullable": true
+          },
+          "breadcrumbs": {
+            "description": "კატეგორიის გზა ფესვიდან (breadcrumbs)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicCategoryRef"
+            }
+          },
+          "compatible_models": {
+            "description": "თავსებადი დამტენები. `is_universal = true` — ერგება ყველას და სია შეიძლება ცარიელი იყოს",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicChargerModel"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "sku",
+          "name",
+          "short_description",
+          "price_minor",
+          "compare_at_price_minor",
+          "currency",
+          "image",
+          "stock_status",
+          "is_universal",
+          "is_featured",
+          "category",
+          "description",
+          "seo_title",
+          "seo_description",
+          "images",
+          "attributes",
+          "oem_part_numbers",
+          "weight_g",
+          "breadcrumbs",
+          "compatible_models"
+        ]
+      },
+      "PublicBrand": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string",
+            "example": "wallbox"
+          },
+          "name": {
+            "type": "string",
+            "example": "Wallbox"
+          },
+          "model_count": {
+            "type": "number",
+            "description": "აქტიური მოდელების რაოდენობა"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "model_count"
+        ]
+      },
+      "SuggestProduct": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "example": "type2-cable-32a-5m"
+          },
+          "name": {
+            "type": "string"
+          },
+          "price_minor": {
+            "type": "number"
+          },
+          "image": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicImage"
+              }
+            ]
+          }
+        },
+        "required": [
+          "slug",
+          "name",
+          "price_minor",
+          "image"
+        ]
+      },
+      "SearchSuggestResponse": {
+        "type": "object",
+        "properties": {
+          "products": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SuggestProduct"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicCategoryRef"
+            }
+          },
+          "charger_models": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicChargerModel"
+            }
+          }
+        },
+        "required": [
+          "products",
+          "categories",
+          "charger_models"
         ]
       }
     }

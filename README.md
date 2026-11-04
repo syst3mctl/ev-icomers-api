@@ -149,6 +149,28 @@ CSRF: cookie-იან `multipart` მოთხოვნას სჭირდ�
 არაფერი იცვლება. `reserved`-ს ადმინი არ ცვლის: ის checkout-ის დაჯავშნაა
 (`docs/06-order-flow.md`).
 
+## საჯარო API (საიტისთვის)
+
+ავტორიზაციის გარეშე, მხოლოდ GET (`src/modules/storefront/`). Swagger-ში — ჯგუფები **`public · …`**.
+
+| endpoint | რას აბრუნებს |
+|---|---|
+| `GET /v1/catalog/categories` | აქტიური კატეგორიების ხე (`children`) |
+| `GET /v1/catalog/products` | აქტიური პროდუქტები. ფილტრები: `category` (slug, ქვეკატეგორიებით), `q`, `min_price`/`max_price` (თეთრი), `in_stock`, `charger_model` (uuid), `charger_brand` (slug), `sort` (`featured`, `newest`, `price_asc`, `price_desc`), `page`, `page_size` |
+| `GET /v1/catalog/products/{slug}` | პროდუქტი: სურათები, მახასიათებლები, breadcrumbs, თავსებადი დამტენები |
+| `GET /v1/catalog/products/{slug}/related` | იმავე კატეგორიიდან, მაქსიმუმ 8 |
+| `GET /v1/compatibility/brands`, `.../brands/{brand_slug}/models`, `.../models/{id}` | „აირჩიე შენი დამტენი“ |
+| `GET /v1/search/suggest?q=` | ავტოშევსება: 5 პროდუქტი, 3 კატეგორია, 5 მოდელი |
+
+**ადმინის API-სგან განსხვავება:** მხოლოდ `ACTIVE` პროდუქტები აქტიურ კატეგორიაში (მონახაზი / არქივი → 404);
+ტექსტი ერთ ენაზე — `?locale=ka|en` (თარგმანი თუ არ არის — ქართული); მარაგი მხოლოდ სტატუსით —
+`stock_status`: `IN_STOCK` / `LOW_STOCK` (`available <= low_stock_threshold`) / `OUT_OF_STOCK`, ზუსტი რიცხვი გარეთ არ გადის;
+`charger_model` / `charger_brand` — თავსებადი **და** უნივერსალური (`is_universal`) პროდუქტები.
+
+**Swagger-ის ძებნა** (`/docs`, ზედა ველი): ჯგუფის სახელი, მისამართი (`products/{slug}`), მეთოდი ან აღწერა;
+რამდენიმე სიტყვა — ყველა უნდა ემთხვეოდეს (`GET brands`). ჯგუფები: `src/openapi-tags.ts` — ახალი controller-ი
+`@ApiTags(TAGS.…)`-ს იყენებს, არა ტექსტს.
+
 ## როგორ ვნახო, რომ მუშაობს
 
 ხუთი ნაბიჯი. თითოეულზე წერია **რას უნდა ელოდე** — თუ სხვა რამე ხდება, პრობლემა სწორედ იმ ნაბიჯზეა და შემდეგზე გადასვლა აზრი არ აქვს.

@@ -34,9 +34,10 @@ import {
   AttachProductsDto,
   AttachProductsResponse,
 } from './dto/product-compatibility.dto.js';
+import { TAGS } from '../../openapi-tags.js';
 
 /** docs/05-api.md §4 → „კატალოგი“: `/admin/charger-models` (editor+) */
-@ApiTags('admin/compatibility')
+@ApiTags(TAGS.adminCompatibility)
 @ApiBearerAuth()
 @Controller('admin/charger-models')
 @UseGuards(AdminGuard)

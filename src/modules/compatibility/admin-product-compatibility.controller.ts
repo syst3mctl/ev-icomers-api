@@ -20,6 +20,7 @@ import {
   ProductCompatibilityResponse,
   SetProductCompatibilityDto,
 } from './dto/product-compatibility.dto.js';
+import { TAGS } from '../../openapi-tags.js';
 
 /**
  * docs/05-api.md §4 → `/admin/products/{id}/compatibility` (editor+).
@@ -27,7 +28,7 @@ import {
  * prefix კატალოგის controller-ის ტოლია, მოდული კი სხვა: თავსებადობის ცხრილს
  * მხოლოდ ეს მოდული ეხება (CLAUDE.md → „მოდულები“).
  */
-@ApiTags('admin/compatibility')
+@ApiTags(TAGS.adminCompatibility)
 @ApiBearerAuth()
 @Controller('admin/products')
 @UseGuards(AdminGuard)

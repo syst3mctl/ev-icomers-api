@@ -93,7 +93,9 @@ export class InventoryService {
          WHERE (NOT ${lowStockOnly}::boolean OR (on_hand - reserved) <= low_stock_threshold)`,
     ]);
 
-    const summaries = await this.productSummaries(rows.map((r) => r.product_id));
+    const summaries = await this.productSummaries(
+      rows.map((r) => r.product_id),
+    );
 
     return {
       items: rows.map((row) =>
@@ -234,6 +236,43 @@ export class InventoryService {
   }
 
   /** სტრიქონი უნდა არსებობდეს, თორემ `UPDATE`-ს განსაახლებელი არაფერი აქვს */
+  // ------------------------------------------------------------------
+  // საჯარო კატალოგისთვის (`storefront`): ზუსტი რაოდენობა გარეთ არ გადის —
+  // storefront მისგან მხოლოდ სტატუსს ითვლის (IN_STOCK / LOW_STOCK / OUT_OF_STOCK).
+  // ------------------------------------------------------------------
+
+  /** ხელმისაწვდომი რაოდენობა და ზღვარი; მარაგის სტრიქონი თუ არ აქვს — სიაში არ არის (= 0) */
+  async availability(
+    productIds: string[],
+  ): Promise<Map<string, { available: number; low_stock_threshold: number }>> {
+    if (productIds.length === 0) return new Map();
+    const rows = await this.prisma.inventoryItem.findMany({
+      where: { product_id: { in: productIds } },
+      select: {
+        product_id: true,
+        on_hand: true,
+        reserved: true,
+        low_stock_threshold: true,
+      },
+    });
+    return new Map(
+      rows.map((r) => [
+        r.product_id,
+        {
+          available: r.on_hand - r.reserved,
+          low_stock_threshold: r.low_stock_threshold,
+        },
+      ]),
+    );
+  }
+
+  /** პროდუქტები, რომლებიც ახლა იყიდება (`on_hand - reserved > 0`) */
+  async inStockProductIds(): Promise<string[]> {
+    const rows = await this.prisma.$queryRaw<{ product_id: string }[]>`
+      SELECT product_id FROM inventory_items WHERE on_hand - reserved > 0`;
+    return rows.map((r) => r.product_id);
+  }
+
   private async ensureItem(productId: string): Promise<ItemRow> {
     return this.prisma.inventoryItem.upsert({
       where: { product_id: productId },

@@ -34,12 +34,13 @@ import {
   ProductImagesService,
   type UploadedImageFile,
 } from './product-images.service.js';
+import { TAGS } from '../../openapi-tags.js';
 
 /**
  * პროდუქტის სურათები. ფაილი API-ზე იტვირთება (multipart) — usectl-ის S3 კლასტერის
  * შიგნითაა და ბრაუზერიდან პირდაპირ (presigned URL-ით) მიუწვდომელია.
  */
-@ApiTags('admin/catalog')
+@ApiTags(TAGS.adminCatalog)
 @ApiBearerAuth()
 @Controller('admin/products/:id/images')
 @UseGuards(AdminGuard)
@@ -59,7 +60,9 @@ export class AdminProductImagesController {
   @ApiCreatedResponse({ type: ProductImageResponse })
   @UseInterceptors(
     // ლიმიტი +1 ბაიტით: ზედმეტად დიდ ფაილს multer არ წყვეტს უხეშად — service აბრუნებს გასაგებ შეცდომას
-    FileInterceptor('file', { limits: { fileSize: MAX_IMAGE_BYTES + 1, files: 1 } }),
+    FileInterceptor('file', {
+      limits: { fileSize: MAX_IMAGE_BYTES + 1, files: 1 },
+    }),
   )
   upload(
     @Param('id', ParseUUIDPipe) id: string,

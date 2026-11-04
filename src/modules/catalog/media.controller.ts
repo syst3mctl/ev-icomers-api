@@ -6,17 +6,23 @@ import {
   ParseUUIDPipe,
   StreamableFile,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiProduces, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiProduces,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AppError } from '../../common/filters/problem-details.filter.js';
 import { StorageService } from '../../infra/storage/storage.service.js';
 import { PRODUCT_IMAGE_FILE } from './media-url.js';
+import { TAGS } from '../../openapi-tags.js';
 
 /**
  * საჯარო სურათები (ავტორიზაციის გარეშე — პროდუქტის ფოტო საიდუმლო არ არის).
  * ფაილის სახელი უნიკალური uuid-ია და არასდროს იცვლება, ამიტომ ბრაუზერი და CDN
  * მას სამუდამოდ ინახავს ქეშში.
  */
-@ApiTags('media')
+@ApiTags(TAGS.publicMedia)
 @Controller('media')
 export class MediaController {
   constructor(private readonly storage: StorageService) {}

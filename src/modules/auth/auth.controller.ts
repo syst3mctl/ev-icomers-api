@@ -46,6 +46,7 @@ import {
 } from './dto/auth.dto.js';
 import type { AdminPrincipal } from './auth.service.js';
 import { ANY_ROLE, Roles } from './roles.js';
+import { TAGS } from '../../openapi-tags.js';
 
 /**
  * ადმინკის ავტორიზაცია.
@@ -54,7 +55,7 @@ import { ANY_ROLE, Roles } from './roles.js';
  * - სხვა კლიენტები (Postman, სკრიპტები, სერვისები): `POST /v1/auth/token` — OAuth 2.0
  *   (`password` და `refresh_token` grant), ტოკენი პასუხში, შემდეგ `Authorization: Bearer`.
  */
-@ApiTags('auth')
+@ApiTags(TAGS.auth)
 @Controller('auth')
 export class AuthController {
   constructor(

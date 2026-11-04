@@ -6,6 +6,7 @@ import { AdminChargerModelsController } from './admin-charger-models.controller.
 import { AdminProductCompatibilityController } from './admin-product-compatibility.controller.js';
 import { ChargerBrandsService } from './charger-brands.service.js';
 import { ChargerModelsService } from './charger-models.service.js';
+import { CompatibilityPublicService } from './compatibility-public.service.js';
 import { CompatibilityService } from './compatibility.service.js';
 
 /**
@@ -22,7 +23,17 @@ import { CompatibilityService } from './compatibility.service.js';
     AdminChargerModelsController,
     AdminProductCompatibilityController,
   ],
-  providers: [ChargerBrandsService, ChargerModelsService, CompatibilityService],
-  exports: [ChargerBrandsService, ChargerModelsService, CompatibilityService],
+  providers: [
+    ChargerBrandsService,
+    ChargerModelsService,
+    CompatibilityService,
+    CompatibilityPublicService,
+  ],
+  exports: [
+    ChargerBrandsService,
+    ChargerModelsService,
+    CompatibilityService,
+    CompatibilityPublicService,
+  ],
 })
 export class CompatibilityModule {}

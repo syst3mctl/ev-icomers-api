@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { PrismaService } from '../../infra/prisma/prisma.service.js';
+import { TAGS } from '../../openapi-tags.js';
 
 class HealthResponse {
   status!: 'ok';
@@ -15,7 +16,7 @@ class HealthResponse {
  * Kubernetes / usectl health checks (docs/10-deployment.md §5).
  * კომპანიის მიკროსერვისები აქ არ მოწმდება: მათი დროებითი გათიშვისას კატალოგი მაინც უნდა მუშაობდეს.
  */
-@ApiTags('health')
+@ApiTags(TAGS.health)
 @Controller({ path: 'health', version: VERSION_NEUTRAL })
 export class HealthController {
   constructor(private readonly prisma: PrismaService) {}

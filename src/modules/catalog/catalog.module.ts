@@ -5,6 +5,7 @@ import { AdminProductImagesController } from './admin-product-images.controller.
 import { AdminProductsController } from './admin-products.controller.js';
 import { MediaController } from './media.controller.js';
 import { ProductImagesService } from './product-images.service.js';
+import { CatalogPublicService } from './catalog-public.service.js';
 import { CategoriesService } from './categories.service.js';
 import { ProductsService } from './products.service.js';
 
@@ -22,7 +23,12 @@ import { ProductsService } from './products.service.js';
     AdminProductImagesController,
     MediaController,
   ],
-  providers: [CategoriesService, ProductsService, ProductImagesService],
-  exports: [CategoriesService, ProductsService],
+  providers: [
+    CategoriesService,
+    ProductsService,
+    ProductImagesService,
+    CatalogPublicService,
+  ],
+  exports: [CategoriesService, ProductsService, CatalogPublicService],
 })
 export class CatalogModule {}

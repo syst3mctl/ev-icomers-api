@@ -29,9 +29,10 @@ import {
   CreateCategoryDto,
   UpdateCategoryDto,
 } from './dto/category.dto.js';
+import { TAGS } from '../../openapi-tags.js';
 
 /** docs/05-api.md §4 → „კატალოგი“: `/admin/categories` (editor+) */
-@ApiTags('admin/catalog')
+@ApiTags(TAGS.adminCatalog)
 @ApiBearerAuth()
 @Controller('admin/categories')
 @UseGuards(AdminGuard)
