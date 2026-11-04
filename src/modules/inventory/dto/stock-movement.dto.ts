@@ -23,14 +23,16 @@ export const MAX_MOVEMENT_QUANTITY = 1_000_000;
  * მიღება და დაბრუნება ზრდის, გაყიდვა და დაზიანება ამცირებს,
  * კორექცია — ორივე მიმართულებით.
  */
-export const MOVEMENT_SIGN: Record<StockMovementType, 'positive' | 'negative' | 'any'> =
-  {
-    [StockMovementType.RECEIPT]: 'positive',
-    [StockMovementType.RETURN]: 'positive',
-    [StockMovementType.SALE]: 'negative',
-    [StockMovementType.DAMAGE]: 'negative',
-    [StockMovementType.ADJUSTMENT]: 'any',
-  };
+export const MOVEMENT_SIGN: Record<
+  StockMovementType,
+  'positive' | 'negative' | 'any'
+> = {
+  [StockMovementType.RECEIPT]: 'positive',
+  [StockMovementType.RETURN]: 'positive',
+  [StockMovementType.SALE]: 'negative',
+  [StockMovementType.DAMAGE]: 'negative',
+  [StockMovementType.ADJUSTMENT]: 'any',
+};
 
 /** `POST /admin/inventory/{product_id}/movements` — docs/05-api.md §4 → „მარაგი“ */
 export class CreateStockMovementDto {
@@ -86,7 +88,7 @@ export class StockMovementResponse {
   @ApiProperty({
     nullable: true,
     type: String,
-    description: 'ადმინის Identity id (`sub`); `null` — სისტემური ჩანაწერი',
+    description: 'ადმინის id (`admin_users.id`); `null` — სისტემური ჩანაწერი',
   })
   actor_id!: string | null;
   @ApiProperty({ format: 'date-time' }) created_at!: string;

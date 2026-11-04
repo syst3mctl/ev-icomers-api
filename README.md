@@ -21,7 +21,7 @@ docker compose up -d          # Postgres, NATS, Mailpit (MinIO დროებ�
 pnpm install                  # აგენერირებს Prisma client-საც
 
 pnpm db:migrate               # მიგრაციები უკვე რეპოშია — მხოლოდ გამოყენება
-pnpm db:seed                  # სატესტო კატეგორიები, დამტენები, პროდუქტები
+pnpm db:seed                  # სატესტო კატეგორიები, დამტენები, პროდუქტები + superadmin (.env → SEED_SUPERADMIN_*)
 
 pnpm start:dev                # API: http://localhost:4000
 ```
@@ -70,26 +70,38 @@ curl -s localhost:4000/v1/admin/categories           # seed-ის კატე�
 
 `/v1/admin/*` დაცულია `AdminGuard`-ით (`src/modules/auth/admin.guard.ts`), როლები `@Roles()`-ით.
 
-⚠️ **JWT-ის შემოწმება JWKS-ით ჯერ არ არის დაწერილი** — Identity-ის issuer და client-ები ჯერ არ გვაქვს
-(`PROJECT.md` §3 → ღია კითხვა `identity-oidc`). სანამ ეს გაირკვევა, guard **დახურულია**:
+მომხმარებლები ჩვენს ბაზაშია (`admin_users`), საჯარო რეგისტრაცია **არ არის** — ახალ მომხმარებელს
+ქმნის `superadmin` (`POST /v1/admin/users`). გადაწყვეტილება: `PROJECT.md` §6 (2026-11-04).
 
-| `NODE_ENV` | ქცევა |
+| რა | როგორ |
 |---|---|
-| `development` | როლები მოდის `DEV_ADMIN_ROLES`-იდან (`.env`) ან `X-Dev-Roles` header-იდან. ტოკენი არ მოწმდება |
-| ყველა სხვა (`test`, `production`) | ყოველთვის `503 AUTH_NOT_CONFIGURED` |
+| პაროლი | scrypt (`src/modules/auth/password.ts`), მინიმუმ 10 სიმბოლო. 5 წარუმატებელი ცდა → 15 წუთით `429 ACCOUNT_LOCKED` |
+| access token | JWT, ES256, 15 წუთი. `iss`/`aud`/`typ: at+jwt` მოწმდება. საჯარო გასაღები: `GET /.well-known/jwks.json` |
+| refresh token | შემთხვევითი სტრიქონი, ბაზაში მხოლოდ SHA-256 ჰეში, 14 დღე. ყოველ refresh-ზე იცვლება; ძველის ხელახლა წარდგენა მთელ სესიას აუქმებს |
+| ბრაუზერი (ადმინკა) | `POST /v1/auth/login` / `refresh` / `logout` — ტოკენები httpOnly + `SameSite=Strict` cookie-ებში (`icomers_admin_at`, `icomers_admin_rt`) |
+| სხვა კლიენტები | `POST /v1/auth/token` — OAuth 2.0 (`grant_type=password` / `refresh_token`), შემდეგ `Authorization: Bearer ...` |
+| როლები | ბაზიდან იკითხება ყოველ მოთხოვნაზე: როლის მოხსნა, გათიშვა ან პაროლის შეცვლა **მაშინვე** მოქმედებს |
+| `superadmin` | ყველა როლს ფარავს + მომხმარებლების მართვა. საკუთარ თავს ვერ მოიხსნის; ბოლო superadmin-ს ვერავინ მოხსნის |
+| ჩაკეტვა | 5 არასწორი ცდა (ატომური მთვლელი) → 15 წუთი. `429 ACCOUNT_LOCKED` მხოლოდ **სწორ** პაროლზე ჩანს — სხვები ხედავენ `401`-ს, რომ ელ. ფოსტის არსებობა ვერ გაიგონ |
+| CSRF | `src/modules/auth/csrf.middleware.ts`: cookie-ით მოსული ცვლილება (და login/refresh/logout/password) უარყოფილია `Sec-Fetch-Site: cross-site / same-site`-ზე და არა-JSON body-ზე → `403 CSRF_REJECTED`. Bearer-ს არ ეხება |
+| ერთდროული refresh | ორმა ჩანართმა ერთად სცადა → წაგებული იღებს `409 REFRESH_RACE`-ს (cookie-ები არ იშლება), ადმინკა უბრალოდ იმეორებს მოთხოვნას |
 
-ასე staging/production-ზე ადმინის endpoint-ები შემთხვევით ღია ვერ დარჩება.
+პირველი superadmin: `.env`-ში `SEED_SUPERADMIN_EMAIL` / `SEED_SUPERADMIN_PASSWORD`, შემდეგ `pnpm db:seed`.
+თუ მომხმარებელი უკვე არსებობს, seed პაროლს **არ ცვლის**.
 
 ```bash
-# ლოკალურად: .env-ში DEV_ADMIN_ROLES=admin
-curl -s localhost:4000/v1/admin/products
+# ტოკენი (OAuth 2.0)
+curl -s -d grant_type=password -d username=superadmin@example.com -d password='...' \
+  localhost:4000/v1/auth/token
+# → { "access_token": "eyJ...", "token_type": "Bearer", "expires_in": 900, "refresh_token": "..." }
 
-# სხვა როლის შემოწმება კონკრეტულ მოთხოვნაზე
-curl -s -H 'X-Dev-Roles: warehouse' localhost:4000/v1/admin/products   # 403 FORBIDDEN
+curl -s -H "Authorization: Bearer eyJ..." localhost:4000/v1/admin/products
 ```
 
-როცა Identity გაიხსნება: `admin.guard.ts`-ში ემატება ტოკენის ვერიფიკაცია (`jose` + JWKS) და
-`roles` claim-ის წაკითხვა; `@Roles()`-ის ლოგიკა და controller-ები უცვლელი რჩება.
+Swagger-ში: **Authorize** → `bearer` ველში access token.
+
+`JWT_PRIVATE_KEY` production-ში სავალდებულოა (გარეშე აპი არ ეშვება). ლოკალურად თუ ცარიელია,
+დროებითი გასაღები იქმნება და API-ს ყოველ გადატვირთვაზე access token-ები უქმდება (ადმინკა refresh-ით თავად აღდგება).
 
 ### რა არსებობს ახლა
 
@@ -148,7 +160,7 @@ pnpm start:dev
 
 თითოეულ ველზე ჩანს, სავალდებულოა თუ არა, რა ტიპია და რა შეზღუდვა აქვს — ეს ავტომატურად მოდის DTO-ების დეკორატორებიდან.
 
-⚠️ ადმინის endpoint-ი `.env`-ში `DEV_ADMIN_ROLES`-ს მოითხოვს (იხ. ზემოთ). მარაგისთვის საჭიროა `warehouse`, `manager` ან `admin`.
+⚠️ ადმინის endpoint-ს ტოკენი სჭირდება: **Authorize** → access token (`POST /v1/auth/token`, იხ. ზემოთ). მარაგისთვის საჭიროა `warehouse`, `manager`, `admin` ან `superadmin`.
 
 ### 4. ბაზა თვალით
 
@@ -193,12 +205,12 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e
 | Status | რას ნიშნავს | ვისი ბრალია |
 |---|---|---|
 | `400` | request-ის **ფორმა** არასწორია: აკლია ველი, ტიპი არ ემთხვევა, არა-uuid id. `errors`-ში ჩანს რომელი ველი | გამომძახებლის (ფრონტი / Swagger-ში შევსება) |
-| `401` | ვინ ხარ — უცნობია | ტოკენი / `DEV_ADMIN_ROLES` |
+| `401` | ვინ ხარ — უცნობია: ტოკენი არ არის (`UNAUTHORIZED`), ვადა გაუვიდა ან სესია გაუქმდა (`TOKEN_INVALID`), არასწორი პაროლი (`INVALID_CREDENTIALS`) | ტოკენი / ლოგინი |
 | `403` | ხარ, მაგრამ როლი არ გაწყობს | როლები |
 | `404` | ობიექტი არ არსებობს | id არასწორია |
 | `409` | კონფლიქტი: `slug` დაკავებულია, მარაგი არ არის, წასაშლელი ცარიელი არ არის | მონაცემების მდგომარეობა — **ეს ნორმალური პასუხია, არა bug** |
 | `422` | ფორმა სწორია, მაგრამ **ბიზნეს-წესი** დაირღვა: `ka` თარგმანი აკლია, ნიშანი ტიპს არ ემთხვევა | request-ის შინაარსი |
-| `503` | ავტორიზაცია გამართული არ არის, ან გარე სერვისი არ პასუხობს | გარემო |
+| `503` | ბაზა არ პასუხობს (`DATABASE_UNAVAILABLE`), ან გარე სერვისი არ პასუხობს | გარემო — **კოდი უდანაშაულოა** |
 | `500` | **ჩვენი bug.** სხვა ყველა კოდი ჩვენ განზრახ დავაბრუნეთ, `500` — არა | კოდი |
 
 `400` და `422`-ის განსხვავება მნიშვნელოვანია: `400`-ს აბრუნებს `ValidationPipe` (DTO-ს დეკორატორები), `422`-ს — ჩვენი `AppError` service-ში.
@@ -217,7 +229,8 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e
 - **`404` ყველა endpoint-ზე** — სავარაუდოდ `/v1` დაგავიწყდა: `/v1/admin/products`, არა `/admin/products` (გამონაკლისი — `/health/*` და `/docs`)
 - **ველი პასუხში არ ჩანს, თუმცა კოდში წერია** — response DTO-ში `@ApiProperty()` და `toXxxResponse()` ფუნქციაში ორივეში უნდა იყოს
 - **ტესტი მწვანეა, Swagger-ში არ მუშაობს** — სავარაუდოდ stub-ი რეალობას არ ემთხვევა. **მართალია Swagger**, და მაშინ stub უნდა გასწორდეს (ასეთი შემთხვევა უკვე გვქონდა)
-- **`pnpm test:e2e`-ზე `503 AUTH_NOT_CONFIGURED`** — ასე უნდა იყოს, იხ. „ცნობილი პრობლემები“
+- **`401 TOKEN_INVALID` API-ს გადატვირთვის შემდეგ** — `.env`-ში `JWT_PRIVATE_KEY` ცარიელია, ყოველ გაშვებაზე ახალი გასაღები იქმნება. ჩაწერე მუდმივი გასაღები (`.env.example`-ში ბრძანებაა)
+- **`503 DATABASE_UNAVAILABLE`** — Postgres არ პასუხობს, კოდში შეცდომა არ არის: `docker compose up -d`. ლოგში ერთი სტრიქონია დრაივერის კოდით (`ECONNREFUSED` — კონტეინერი არ მუშაობს, `ENOTFOUND` — `DATABASE_URL`-ის host არასწორია)
 
 ### როგორ ვიცი, რომ გზიდან არ გადავუხვიეთ
 
@@ -232,7 +245,8 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e
 | `pnpm install` ვარდება: *„Prisma only supports Node.js versions 20.19+, 22.12+, 24.0+“* | სისტემაში Homebrew-ის Node 23-ია. `nvm use` (რეპოში `.nvmrc`), ან სამუდამოდ `nvm alias default 24` |
 | `docker compose up -d` ვარდება: *„pull access denied for minio/minio“* | MinIO-ს community image-ები აღარ არის თავისუფლად ჩამოსატვირთი: `minio/minio` Docker Hub-ზე აღარ არსებობს, quay.io-ზე ავტორიზაციას ითხოვს. სერვისი დროებით კომენტარშია `docker-compose.yml`-ში. S3 ეტაპ 1-იდან დაგვჭირდება — მაშინ შეირჩევა ჩანაცვლება (localstack / seaweedfs / garage / adobe-s3mock) |
 | macOS: *„You can't open the application Docker because it is not responding“* | Docker Desktop-ის GUI მოკვდა, backend პროცესები მიტოვებული დარჩა. გაასუფთავე და ხელახლა გაუშვი: `pkill -f 'Docker.app/Contents/MacOS'` → `open -a Docker` |
-| ტესტებში ადმინის endpoint-ი 503-ს აბრუნებს | ასე უნდა იყოს: e2e `NODE_ENV=test`-ზე გარბის. endpoint-ის ტესტირებისას guard გადაფარე `.overrideGuard(AdminGuard)`-ით (**არა** `overrideProvider`-ით — guard-ზე ის არ მოქმედებს). მაგალითი: `test/admin-catalog.e2e-spec.ts` |
+| API `503 DATABASE_UNAVAILABLE`-ს აბრუნებს (ლოგში `ECONNREFUSED`) | Postgres არ მუშაობს. **Docker Desktop-ის გაშვება კონტეინერებს არ უშვებს** — საჭიროა `docker compose up -d` რეპოს ფოლდერიდან. შემოწმება: `docker compose ps` (სამი კონტეინერი `Up`) და `nc -zv localhost 5432`. API-ს გადატვირთვა არ სჭირდება — Prisma ახალ მოთხოვნაზე თავად დაუკავშირდება |
+| ტესტებში ადმინის endpoint-ი 401-ს აბრუნებს | ტოკენი არ არის. endpoint-ის ტესტირებისას guard გადაფარე `.overrideGuard(AdminGuard)`-ით (**არა** `overrideProvider`-ით — guard-ზე ის არ მოქმედებს). მაგალითი: `test/admin-catalog.e2e-spec.ts`. მთელი auth ნაკადი ბაზის გარეშე: `test/auth.e2e-spec.ts` (`test/support/fake-auth-prisma.ts`) |
 
 ## სტრუქტურა
 

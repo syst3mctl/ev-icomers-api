@@ -1,53 +1,59 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 import { AppError } from '../../common/filters/problem-details.filter.js';
-import type { Env } from '../../config/env.js';
-import { ROLES_METADATA_KEY, type Role } from './roles.js';
+import { readAccessToken } from './auth.cookies.js';
+import { AuthService, type AdminPrincipal } from './auth.service.js';
+import { hasAnyRole, ROLES_METADATA_KEY, type Role } from './roles.js';
+import { TokenService } from './token.service.js';
 
-/** მოთხოვნას დართული ადმინი (ტოკენიდან ან dev-რეჟიმში env-იდან) */
-export interface AdminPrincipal {
-  /** Identity-ის `sub` */
-  id: string;
-  roles: Role[];
-}
+export type { AdminPrincipal } from './auth.service.js';
 
 export type RequestWithAdmin = Request & { admin?: AdminPrincipal };
 
 /**
  * `/v1/admin/*`-ის დაცვა.
  *
- * ⚠️ **დროებითი იმპლემენტაცია.** JWT-ის შემოწმება JWKS-ით ჯერ არ არის დაწერილი:
- * Identity-ის issuer და client-ები ჯერ არ გვაქვს (`PROJECT.md` §3 → `identity-oidc`).
+ * 1. access token: `Authorization: Bearer ...` ან `icomers_admin_at` cookie;
+ * 2. ხელმოწერა, ვადა, `iss`/`aud` (ES256, `TokenService`);
+ * 3. მომხმარებელი ბაზაში ჯერ კიდევ აქტიურია და პაროლი ტოკენის გაცემის შემდეგ არ შეცვლილა;
+ * 4. როლი — ბაზიდან (არა ტოკენიდან), რომ როლის მოხსნა მაშინვე მოქმედებდეს.
  *
- * სანამ ის არ გაკეთდება, guard **დახურულია**:
- * - `NODE_ENV !== 'development'` → ყოველთვის `503 AUTH_NOT_CONFIGURED`;
- *   ანუ staging/production-ზე ადმინის endpoint-ები შემთხვევით ღია ვერ დარჩება.
- * - `development`-ში როლები მოდის `DEV_ADMIN_ROLES` env ცვლადიდან, ან კონკრეტულ
- *   მოთხოვნაზე `X-Dev-Roles` header-იდან (ტესტებისთვის და ადმინკის ლოკალური გაშვებისთვის).
- *
- * როცა Identity გაიხსნება: აქ ჩაემატება ტოკენის ვერიფიკაცია (`jose` + JWKS) და
- * `roles` claim-ის წაკითხვა; `@Roles()`-ის ლოგიკა უცვლელი რჩება.
+ * `@Roles()`-ის გარეშე მხოლოდ `admin`-ს უშვებს. `superadmin` ყოველთვის გადის.
  */
 @Injectable()
 export class AdminGuard implements CanActivate {
-  private readonly logger = new Logger(AdminGuard.name);
-  private warned = false;
-
   constructor(
     private readonly reflector: Reflector,
-    private readonly config: ConfigService<Env, true>,
+    private readonly tokens: TokenService,
+    private readonly auth: AuthService,
   ) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<RequestWithAdmin>();
-    const admin = this.resolveAdmin(req);
+
+    const token = readAccessToken(req);
+    if (!token) {
+      throw new AppError(401, 'UNAUTHORIZED', 'საჭიროა ავტორიზაცია');
+    }
+
+    const claims = await this.tokens.verifyAccessToken(token);
+    if (!claims) {
+      throw new AppError(
+        401,
+        'TOKEN_INVALID',
+        'ტოკენი არასწორია ან ვადა გაუვიდა',
+      );
+    }
+
+    const admin = await this.auth.principalFor(claims.sub, claims.iat);
+    if (!admin) {
+      throw new AppError(
+        401,
+        'TOKEN_INVALID',
+        'სესია აღარ მოქმედებს. შედი თავიდან',
+      );
+    }
     req.admin = admin;
 
     const required = this.reflector.getAllAndOverride<Role[]>(
@@ -55,7 +61,7 @@ export class AdminGuard implements CanActivate {
       [context.getHandler(), context.getClass()],
     ) ?? ['admin'];
 
-    if (!required.some((role) => admin.roles.includes(role))) {
+    if (!hasAnyRole(admin.roles, required)) {
       throw new AppError(
         403,
         'FORBIDDEN',
@@ -64,42 +70,5 @@ export class AdminGuard implements CanActivate {
     }
 
     return true;
-  }
-
-  private resolveAdmin(req: RequestWithAdmin): AdminPrincipal {
-    if (this.config.get('NODE_ENV', { infer: true }) !== 'development') {
-      throw new AppError(
-        503,
-        'AUTH_NOT_CONFIGURED',
-        'ადმინის ავტორიზაცია ჯერ არ არის გამართული (Identity / JWKS)',
-      );
-    }
-
-    if (!this.warned) {
-      this.warned = true;
-      this.logger.warn(
-        'ადმინის endpoint-ები dev-რეჟიმშია: როლები მოდის DEV_ADMIN_ROLES / X-Dev-Roles-იდან, ტოკენი არ მოწმდება',
-      );
-    }
-
-    const header = req.headers['x-dev-roles'];
-    const raw =
-      (typeof header === 'string' ? header : undefined) ??
-      this.config.get('DEV_ADMIN_ROLES', { infer: true }).join(',');
-
-    const roles = raw
-      .split(',')
-      .map((r) => r.trim())
-      .filter(Boolean) as Role[];
-
-    if (roles.length === 0) {
-      throw new AppError(
-        401,
-        'UNAUTHORIZED',
-        'როლები არ არის: მიუთითე DEV_ADMIN_ROLES .env-ში ან X-Dev-Roles header-ში',
-      );
-    }
-
-    return { id: 'dev-admin', roles };
   }
 }

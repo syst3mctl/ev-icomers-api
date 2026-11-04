@@ -1,7 +1,8 @@
 # ერთი image სამი usectl აპისთვის (docs/10-deployment.md):
-#   api      — ნაგულისხმევი ბრძანება (node dist/main.js)
+#   api      — ნაგულისხმევი ბრძანება: scripts/start.sh (მიგრაციები + superadmin + API)
 #   worker   — node dist/worker.js
 #   migrate  — node_modules/.bin/prisma migrate deploy   (release, ყოველი deploy-ის წინ)
+#   პირველი superadmin (ერთხელ): node dist/scripts/create-superadmin.js  (env: SEED_SUPERADMIN_*)
 
 FROM node:24-slim AS base
 RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates \
@@ -27,6 +28,8 @@ COPY --from=build --chown=node:node /app/package.json /app/prisma.config.ts ./
 COPY --from=build --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/dist ./dist
 COPY --from=build --chown=node:node /app/prisma ./prisma
+COPY --chown=node:node scripts/start.sh ./scripts/start.sh
 USER node
 EXPOSE 4000
-CMD ["node", "dist/main.js"]
+# მიგრაციები → superadmin (თუ env-შია) → API. იხ. scripts/start.sh
+CMD ["sh", "scripts/start.sh"]

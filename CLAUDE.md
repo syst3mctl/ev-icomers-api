@@ -75,7 +75,7 @@ prisma/
 - **Prisma თუ raw SQL:** CRUD — Prisma; რთული/ცხელი query — `$queryRaw` (მარაგის დაჯავშნა, თავსებადობის ფილტრი, ფასეტების დათვლა). ORM-ის ჩანაცვლება არ იგეგმება — გაზომილია (`docs/01-tech-stack.md` §3). `include`-ის ნაცვლად `select`, სადაც ყველა სვეტი არ გვჭირდება; ახალი ცხელი query — `EXPLAIN ANALYZE`-ით.
 - **ბაზის სქემა:** ცხრილები და ველები `snake_case` (Prisma-ს მოდელები PascalCase, `@@map`-ით). ყოველი ცვლილება — მიგრაცია (`pnpm db:migrate --name ...`), ხელით რედაქტირება არა.
 - **კომპანიის სერვისები** (Billing, Fiscal, Identity) მხოლოდ ინტერფეისის მიღმა (`PaymentGateway`, `FiscalGateway`): gRPC იმპლემენტაცია + mock ტესტებისთვის. proto ფაილები ჯერ არ გვაქვს — ბიზნეს-ლოგიკა ინტერფეისზე იწერება.
-- **ავტორიზაცია:** ყველა `/v1/admin/*` — `@UseGuards(AdminGuard)` + `@Roles()` (`src/modules/auth/`). ტოკენის ვერიფიკაცია ჯერ არ არის (Identity გვაკლია), guard dev-ის გარეთ `503`-ს აბრუნებს — დეტალები README-ში.
+- **ავტორიზაცია:** ყველა `/v1/admin/*` — `@UseGuards(AdminGuard)` + `@Roles()` (`src/modules/auth/`). საკუთარი auth (Identity-ის ნაცვლად, PROJECT.md §6 2026-11-04): `admin_users`, JWT ES256 + refresh rotation, httpOnly cookie ადმინკისთვის, OAuth 2.0 `/v1/auth/token` სხვებისთვის. როლები guard-ში ბაზიდან იკითხება. `superadmin` ყველაფერს ფარავს. დეტალები README-ში.
 - **ტესტებში guard-ის გადაფარვა:** `.overrideGuard(AdminGuard)`, არა `.overrideProvider()` — guard-ზე ის არ მოქმედებს.
 - **ტესტები:** ფული, მარაგი, შეკვეთის სტატუსები და checkout — აუცილებლად. სავალდებულო: 10 პარალელური checkout ბოლო ერთეულზე → წარმატებით მხოლოდ 1.
 - **API-ს ცვლილების შემდეგ:** `pnpm openapi:export` და `openapi.json` commit-ში — ამაზეა დამოკიდებული ორივე ფრონტი (`SYSTEM.md` §5).
@@ -98,7 +98,7 @@ prisma/
 - ✅ საფუძველი: NestJS, config, ლოგები, problem+json, health, Swagger, Prisma-ს სქემა (კატალოგი, თავსებადობა, მარაგი), seed, docker-compose, Dockerfile, CI.
 - ✅ ლოკალური გარემო გამართულია: მიგრაციები (`init`, `inventory_checks`) რეპოშია და გამოყენებულია, seed გარბის, API ადგება.
 - ✅ `catalog` მოდული — ადმინის endpoint-ები: `/v1/admin/categories` (CRUD), `/v1/admin/products` (სია, შექმნა, ცვლილება, არქივი).
-- ✅ `auth` მოდული — `AdminGuard` + `@Roles()`. **JWT/JWKS ჯერ არ არის**: dev-ში როლები `DEV_ADMIN_ROLES`/`X-Dev-Roles`-იდან, სხვაგან `503 AUTH_NOT_CONFIGURED` (README → „ადმინის endpoint-ები და ავტორიზაცია“).
+- ✅ `auth` მოდული — მომხმარებლები (`/v1/admin/users`, superadmin), login/refresh/logout/password, OAuth 2.0 token endpoint, JWKS, `AdminGuard` + `@Roles()` (README → „ადმინის endpoint-ები და ავტორიზაცია“).
 - ✅ `compatibility` მოდული — `/v1/admin/charger-brands` (CRUD), `/v1/admin/charger-models` (CRUD + `{id}/products` მიბმა/მოხსნა), `/v1/admin/products/{id}/compatibility` (GET/PUT).
 - ✅ `inventory` მოდული — `/v1/admin/inventory` (სია, `low_stock`), `/v1/admin/inventory/{product_id}` (GET/PATCH ზღვარი), `{product_id}/movements` (POST/GET). ცვლილება ერთ ტრანზაქციაში, `UPDATE ... WHERE on_hand + qty >= reserved`.
 - ⏭ შემდეგი: საჯარო `/v1/catalog/...` და `/v1/compatibility/...` (ფასეტები, თავსებადობის ფილტრი), პროდუქტის სურათები (S3), staging-ზე deploy.

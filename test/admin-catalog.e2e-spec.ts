@@ -275,19 +275,21 @@ describe('Admin guard (e2e)', () => {
     await app.close();
   });
 
-  /**
-   * ტესტები NODE_ENV=test-ზე გარბიან (vitest.config.e2e.ts), ანუ development-ის გარეთ.
-   * ეს სწორედ ის შემთხვევაა, რომელშიც ადმინის endpoint-ი დახურული უნდა იყოს,
-   * სანამ Identity-ის ტოკენის შემოწმება არ დაემატება.
-   */
-  it('development-ის გარეთ ადმინის endpoint-ი დახურულია', async () => {
-    const res = await request(app.getHttpServer()).get(
-      '/v1/admin/categories',
-    );
+  /** ტოკენის გარეშე ადმინის endpoint-ი დახურულია (სრული ნაკადი: test/auth.e2e-spec.ts) */
+  it('ტოკენის გარეშე ადმინის endpoint-ი → 401', async () => {
+    const res = await request(app.getHttpServer()).get('/v1/admin/categories');
 
-    expect(res.status).toBe(503);
+    expect(res.status).toBe(401);
     expect(res.headers['content-type']).toContain('application/problem+json');
-    expect(res.body.code).toBe('AUTH_NOT_CONFIGURED');
+    expect(res.body.code).toBe('UNAUTHORIZED');
+  });
+
+  it('ძველი X-Dev-Roles header-ი აღარ მუშაობს', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/v1/admin/categories')
+      .set('X-Dev-Roles', 'admin');
+
+    expect(res.status).toBe(401);
   });
 
   it('საჯარო health endpoint კი მუშაობს', () =>

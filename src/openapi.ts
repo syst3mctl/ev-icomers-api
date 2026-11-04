@@ -15,6 +15,7 @@ export function buildOpenApi(app: INestApplication): OpenAPIObject {
     .setDescription('icomers ონლაინ მაღაზიის REST API')
     .setVersion('1')
     .addBearerAuth()
+    .addCookieAuth('icomers_admin_at')
     .build();
   return SwaggerModule.createDocument(app, config);
 }

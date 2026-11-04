@@ -45,19 +45,42 @@ const envSchema = z.object({
   RESERVATION_TTL_MINUTES: z.coerce.number().int().positive().default(15),
 
   /**
-   * მხოლოდ ლოკალური დეველოპმენტისთვის: რომელი როლებით მივდივართ `/v1/admin/*`-ზე,
-   * სანამ Identity-ის JWT-ის შემოწმება არ გაკეთდება (იხ. `AdminGuard`).
-   * `NODE_ENV=development`-ის გარეთ არ მოქმედებს.
+   * Express-ის `trust proxy`: რამდენი reverse proxy დგას API-ს წინ (usectl-ზე:
+   * Cloudflare → Traefik → ადმინკის nginx). საჭიროა სწორი `req.ip`-ისთვის
+   * (ლოგი, refresh token-ის `ip`). 0 — არცერთი (ლოკალურად).
    */
-  DEV_ADMIN_ROLES: z
+  TRUST_PROXY_HOPS: z.coerce.number().int().min(0).default(0),
+
+  // --- ადმინის ავტორიზაცია (src/modules/auth) ---
+
+  /**
+   * JWT-ის ხელმოწერის გასაღები: ES256 (P-256) private key, PKCS#8 PEM.
+   * `\n` შეიძლება ჩაიწეროს ერთ სტრიქონში — წაკითხვისას ნამდვილ ხაზად იქცევა.
+   * production-ში სავალდებულოა. development/test-ში თუ არ არის, გაშვებისას
+   * დროებითი გასაღები იქმნება (access token-ები API-ს გადატვირთვისას უქმდება,
+   * refresh token-ები კი რჩება — ადმინკა მომხმარებლისთვის შეუმჩნევლად განაახლებს).
+   * გენერაცია: `openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256`
+   */
+  JWT_PRIVATE_KEY: z
     .string()
-    .default('')
-    .transform((v) =>
-      v
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean),
-    ),
+    .optional()
+    .transform((v) => (v ? v.replace(/\\n/g, '\n') : undefined)),
+  /** JWKS-ში `kid`; გასაღების შეცვლისას იცვლება */
+  JWT_KEY_ID: z.string().min(1).default('icomers-1'),
+  /** ტოკენის `iss` — API-ს საჯარო მისამართი */
+  JWT_ISSUER: z.string().min(1).default('http://localhost:4000'),
+  /** ტოკენის `aud` */
+  JWT_AUDIENCE: z.string().min(1).default('icomers-admin'),
+  ACCESS_TOKEN_TTL_SECONDS: z.coerce.number().int().min(60).default(900),
+  REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().min(1).default(14),
+  /**
+   * cookie-ს `Secure` ატრიბუტი. ნაგულისხმევად ჩართულია ყველგან, გარდა development-ისა
+   * (ლოკალურად http://localhost-ზე ვმუშაობთ).
+   */
+  COOKIE_SECURE: z
+    .enum(['true', 'false'])
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v === 'true')),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -70,5 +93,11 @@ export function validateEnv(raw: Record<string, unknown>): Env {
       .join('\n');
     throw new Error(`Invalid environment variables:\n${details}`);
   }
-  return result.data;
+  const env = result.data;
+  if (env.NODE_ENV === 'production' && !env.JWT_PRIVATE_KEY) {
+    throw new Error(
+      'Invalid environment variables:\n  - JWT_PRIVATE_KEY: required in production',
+    );
+  }
+  return env;
 }

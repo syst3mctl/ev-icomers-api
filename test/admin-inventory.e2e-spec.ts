@@ -96,6 +96,7 @@ describe('Admin inventory (e2e)', () => {
         }) => {
           ctx.switchToHttp().getRequest().admin = {
             id: ACTOR_ID,
+            email: 'warehouse@test.ge',
             roles: ['warehouse'],
           };
           return true;
@@ -260,11 +261,10 @@ describe('Admin inventory guard (e2e)', () => {
     await app.close();
   });
 
-  /** ტესტები `NODE_ENV=test`-ზე გარბიან, ანუ development-ის გარეთ — endpoint დახურულია */
-  it('development-ის გარეთ მარაგის endpoint-ი დახურულია', async () => {
+  it('ტოკენის გარეშე მარაგის endpoint-ი → 401', async () => {
     const res = await request(app.getHttpServer()).get('/v1/admin/inventory');
 
-    expect(res.status).toBe(503);
-    expect(res.body.code).toBe('AUTH_NOT_CONFIGURED');
+    expect(res.status).toBe(401);
+    expect(res.body.code).toBe('UNAUTHORIZED');
   });
 });

@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../src/generated/prisma/client.js';
+import { bootstrapSuperadmin } from '../src/modules/auth/bootstrap-superadmin.js';
 
 /**
  * სატესტო მონაცემები ლოკალური დეველოპმენტისთვის: `pnpm db:seed`.
@@ -146,11 +147,7 @@ async function main(): Promise<void> {
     });
   }
 
-  console.log('Seed completed');
-}
+  await bootstrapSuperadmin(prisma);
 
-try {
-  await main();
-} finally {
-  await prisma.$disconnect();
+  console.log('Seed completed');
 }

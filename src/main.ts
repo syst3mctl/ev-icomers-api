@@ -15,6 +15,11 @@ async function bootstrap(): Promise<void> {
 
   configureApp(app);
 
+  const proxyHops = config.get('TRUST_PROXY_HOPS', { infer: true });
+  if (proxyHops > 0) {
+    app.getHttpAdapter().getInstance().set('trust proxy', proxyHops);
+  }
+
   const origins = config.get('CORS_ORIGINS', { infer: true });
   app.enableCors({
     origin: origins.length ? origins : false,

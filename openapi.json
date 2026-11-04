@@ -1,6 +1,390 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/v1/auth/login": {
+      "post": {
+        "description": "ტოკენებს httpOnly cookie-ებად აყენებს. შეცდომები: `401 INVALID_CREDENTIALS`, `403 ACCOUNT_DISABLED`, `429 ACCOUNT_LOCKED` (5 წარუმატებელი ცდის შემდეგ 15 წუთით).",
+        "operationId": "AuthController_login_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "შესვლა (ბრაუზერი)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/refresh": {
+      "post": {
+        "description": "refresh cookie-ით გასცემს ახალ წყვილს; ძველი refresh token უქმდება. `401 INVALID_REFRESH_TOKEN`",
+        "operationId": "AuthController_refresh_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "სესიის განახლება (ბრაუზერი)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "description": "სესია უქმდება, cookie-ები იშლება. ყოველთვის 204",
+        "operationId": "AuthController_logout_v1",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "გასვლა",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/me": {
+      "get": {
+        "operationId": "AuthController_me_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "მიმდინარე მომხმარებელი",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/password": {
+      "post": {
+        "description": "ყველა სხვა სესია უქმდება. `422 INVALID_CURRENT_PASSWORD`",
+        "operationId": "AuthController_changePassword_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "საკუთარი პაროლის შეცვლა",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/token": {
+      "post": {
+        "description": "`grant_type=password` (username + password) ან `grant_type=refresh_token`. პასუხი და შეცდომები RFC 6749-ის ფორმატშია (არა problem+json).",
+        "operationId": "AuthController_token_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequestDto"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "OAuth 2.0 token endpoint",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/.well-known/jwks.json": {
+      "get": {
+        "operationId": "JwksController_jwks",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "`{ keys: [...] }`"
+          }
+        },
+        "summary": "JWKS — JWT-ის შესამოწმებელი საჯარო გასაღები",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/admin/users": {
+      "get": {
+        "operationId": "AdminUsersController_list_v1",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page_size",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 24,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserListResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "მომხმარებლების სია",
+        "tags": [
+          "admin/users"
+        ]
+      },
+      "post": {
+        "description": "`409 EMAIL_TAKEN`. პაროლი მინიმუმ 10 სიმბოლო.",
+        "operationId": "AdminUsersController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAdminUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ახალი მომხმარებლის რეგისტრაცია",
+        "tags": [
+          "admin/users"
+        ]
+      }
+    },
+    "/v1/admin/users/{id}": {
+      "get": {
+        "operationId": "AdminUsersController_getById_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "ერთი მომხმარებელი",
+        "tags": [
+          "admin/users"
+        ]
+      },
+      "patch": {
+        "description": "პაროლის შეცვლა ან გათიშვა მომხმარებლის ყველა სესიას აუქმებს. `409 CANNOT_DEMOTE_SELF`, `409 LAST_SUPERADMIN`",
+        "operationId": "AdminUsersController_update_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAdminUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "მომხმარებლის შეცვლა: სახელი, როლები, გათიშვა, ახალი პაროლი",
+        "tags": [
+          "admin/users"
+        ]
+      }
+    },
     "/health/live": {
       "get": {
         "operationId": "HealthController_live",
@@ -1365,9 +1749,302 @@
         "scheme": "bearer",
         "bearerFormat": "JWT",
         "type": "http"
+      },
+      "cookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "icomers_admin_at"
       }
     },
     "schemas": {
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "superadmin@gmail.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "AdminUserResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string",
+            "nullable": true
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "superadmin",
+                "admin",
+                "manager",
+                "content_editor",
+                "warehouse"
+              ]
+            }
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "last_login_at": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "display_name",
+          "roles",
+          "is_active",
+          "last_login_at",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "SessionResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/AdminUserResponse"
+          },
+          "expires_in": {
+            "type": "number",
+            "description": "access token-ის ვადა, წამებში"
+          }
+        },
+        "required": [
+          "user",
+          "expires_in"
+        ]
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "current_password": {
+            "type": "string",
+            "format": "password"
+          },
+          "new_password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 10,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "current_password",
+          "new_password"
+        ]
+      },
+      "TokenRequestDto": {
+        "type": "object",
+        "properties": {
+          "grant_type": {
+            "type": "string",
+            "enum": [
+              "password",
+              "refresh_token"
+            ]
+          },
+          "username": {
+            "type": "string",
+            "description": "`grant_type=password`: ელ. ფოსტა"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "description": "`grant_type=password`"
+          },
+          "refresh_token": {
+            "type": "string",
+            "description": "`grant_type=refresh_token`"
+          },
+          "scope": {
+            "type": "string",
+            "description": "იგნორირდება"
+          },
+          "client_id": {
+            "type": "string",
+            "description": "იგნორირდება (first-party კლიენტი)"
+          }
+        },
+        "required": [
+          "grant_type"
+        ]
+      },
+      "TokenResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string"
+          },
+          "token_type": {
+            "type": "string",
+            "example": "Bearer"
+          },
+          "expires_in": {
+            "type": "number",
+            "description": "access token-ის ვადა, წამებში",
+            "example": 900
+          },
+          "refresh_token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_token",
+          "token_type",
+          "expires_in",
+          "refresh_token"
+        ]
+      },
+      "OAuthErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "enum": [
+              "invalid_request",
+              "invalid_grant",
+              "unsupported_grant_type"
+            ]
+          },
+          "error_description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "AdminUserListResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminUserResponse"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "page_size": {
+            "type": "number"
+          },
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ]
+      },
+      "CreateAdminUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "editor@example.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 10,
+            "maxLength": 128
+          },
+          "display_name": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 120
+          },
+          "roles": {
+            "type": "array",
+            "example": [
+              "content_editor"
+            ],
+            "items": {
+              "type": "string",
+              "enum": [
+                "superadmin",
+                "admin",
+                "manager",
+                "content_editor",
+                "warehouse"
+              ]
+            }
+          }
+        },
+        "required": [
+          "email",
+          "password",
+          "roles"
+        ]
+      },
+      "UpdateAdminUserDto": {
+        "type": "object",
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 120
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "superadmin",
+                "admin",
+                "manager",
+                "content_editor",
+                "warehouse"
+              ]
+            }
+          },
+          "is_active": {
+            "type": "boolean",
+            "description": "`false` — ანგარიში ითიშება, სესიები უქმდება"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 10,
+            "maxLength": 128
+          }
+        }
+      },
       "HealthResponse": {
         "type": "object",
         "properties": {}
@@ -2734,7 +3411,7 @@
           "actor_id": {
             "type": "string",
             "nullable": true,
-            "description": "ადმინის Identity id (`sub`); `null` — სისტემური ჩანაწერი"
+            "description": "ადმინის id (`admin_users.id`); `null` — სისტემური ჩანაწერი"
           },
           "created_at": {
             "type": "string",

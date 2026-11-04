@@ -237,7 +237,7 @@ model StockMovement {
   quantity   Int
   order_id   String?           @db.Uuid
   reason     String?
-  /// ადმინის Identity id (sub)
+  /// ადმინის id (admin_users.id)
   actor_id   String?
   created_at DateTime          @default(now()) @db.Timestamptz
 
@@ -261,4 +261,56 @@ model StockReservation {
   @@index([status, expires_at])
   @@index([order_id])
   @@map("stock_reservations")
+}
+
+// ---------------------------------------------------------------------------
+// ადმინ-პანელის მომხმარებლები და სესიები (PROJECT.md §6, 2026-11-04)
+// ---------------------------------------------------------------------------
+
+/// ადმინკის მომხმარებელი. საჯარო რეგისტრაცია არ არსებობს — მომხმარებელს ქმნის superadmin.
+/// არ იშლება (stock_movements.actor_id და სხვა ისტორია მას მიუთითებს) — ითიშება `is_active`-ით.
+model AdminUser {
+  id                  String    @id @default(uuid()) @db.Uuid
+  /// ყოველთვის პატარა ასოებით
+  email               String    @unique
+  /// `scrypt$N$r$p$salt$hash` (src/modules/auth/password.ts)
+  password_hash       String
+  display_name        String?
+  /// superadmin | admin | manager | content_editor | warehouse (src/modules/auth/roles.ts)
+  roles               String[]  @default([])
+  is_active           Boolean   @default(true)
+  /// ზედიზედ წარუმატებელი ლოგინები; 5-ის შემდეგ ანგარიში დროებით იკეტება
+  failed_login_count  Int       @default(0)
+  locked_until        DateTime? @db.Timestamptz
+  last_login_at       DateTime? @db.Timestamptz
+  /// ამაზე ადრე გაცემული access token-ები აღარ მოქმედებს
+  password_changed_at DateTime  @default(now()) @db.Timestamptz
+  created_by          String?   @db.Uuid
+  created_at          DateTime  @default(now()) @db.Timestamptz
+  updated_at          DateTime  @updatedAt @db.Timestamptz
+
+  refresh_tokens AdminRefreshToken[]
+
+  @@map("admin_users")
+}
+
+/// refresh token-ები. ბაზაში მხოლოდ SHA-256 ჰეში ინახება. ყოველ refresh-ზე იცვლება (rotation);
+/// უკვე გამოყენებულის ხელახლა წარდგენისას მთელი `family` უქმდება (ტოკენი მოპარულია).
+model AdminRefreshToken {
+  id         String    @id @default(uuid()) @db.Uuid
+  user_id    String    @db.Uuid
+  /// ერთი ლოგინიდან წარმოშობილი ტოკენების ჯაჭვი
+  family_id  String    @db.Uuid
+  token_hash String    @unique
+  expires_at DateTime  @db.Timestamptz
+  revoked_at DateTime? @db.Timestamptz
+  user_agent String?
+  ip         String?
+  created_at DateTime  @default(now()) @db.Timestamptz
+
+  user AdminUser @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([family_id])
+  @@map("admin_refresh_tokens")
 }
