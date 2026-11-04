@@ -20,13 +20,14 @@ icomers ონლაინ მაღაზიის backend. **მთელი �
 | ლოგები | `nestjs-pino` |
 | ტესტები | Vitest (unit: `src/**/*.spec.ts`, e2e: `test/**/*.e2e-spec.ts`) |
 | Lint / ფორმატი | oxlint, Prettier |
-| მოგვიანებით | NATS JetStream (`@nats-io/*`), gRPC (`@grpc/grpc-js`, Buf, ts-proto), S3 (`@aws-sdk/client-s3`), `jose` (JWT/JWKS) |
+| ფაილები | S3 (`@aws-sdk/client-s3`) staging-ზე / ლოკალური დისკი (`src/infra/storage/`) |
+| მოგვიანებით | NATS JetStream (`@nats-io/*`), gRPC (`@grpc/grpc-js`, Buf, ts-proto) |
 
 ## ბრძანებები
 
 ```bash
 nvm use                     # Node 24 — სისტემაში Node 23-ია, Prisma მას არ უშვებს
-docker compose up -d        # Postgres, NATS, Mailpit (MinIO დროებით გათიშულია)
+docker compose up -d        # Postgres, NATS, Mailpit (სურათები ლოკალურად .storage/-ში)
 pnpm start:dev              # API → http://localhost:4000 (Swagger: /docs)
 pnpm start:worker           # Worker
 pnpm lint && pnpm typecheck
@@ -105,6 +106,7 @@ prisma/
 - ✅ `auth` მოდული — მომხმარებლები (`/v1/admin/users`, superadmin), login/refresh/logout/password, OAuth 2.0 token endpoint, JWKS, `AdminGuard` + `@Roles()` (README → „ადმინის endpoint-ები და ავტორიზაცია“).
 - ✅ `compatibility` მოდული — `/v1/admin/charger-brands` (CRUD), `/v1/admin/charger-models` (CRUD + `{id}/products` მიბმა/მოხსნა), `/v1/admin/products/{id}/compatibility` (GET/PUT).
 - ✅ `inventory` მოდული — `/v1/admin/inventory` (სია, `low_stock`), `/v1/admin/inventory/{product_id}` (GET/PATCH ზღვარი), `{product_id}/movements` (POST/GET). ცვლილება ერთ ტრანზაქციაში, `UPDATE ... WHERE on_hand + qty >= reserved`.
-- ⏭ შემდეგი: საჯარო `/v1/catalog/...` და `/v1/compatibility/...` (ფასეტები, თავსებადობის ფილტრი), პროდუქტის სურათები (S3), staging-ზე deploy.
-- ⚠️ გადასაწყვეტია: MinIO-ს ჩანაცვლება ლოკალური S3-ისთვის (README → „ცნობილი პრობლემები“). საჭირო ხდება ეტაპ 1-ზე, სურათების ატვირთვისას.
+- ✅ პროდუქტის სურათები (2026-11-04): `POST/DELETE /v1/admin/products/{id}/images`, `PUT .../images/order`, საჯარო `GET /v1/media/...`. S3 staging-ზე, ლოკალურად დისკი (README → „პროდუქტის სურათები“). presigned URL-ის ნაცვლად — ატვირთვა API-ზე (usectl-ის S3 ბრაუზერისთვის მიუწვდომელია).
+- ✅ staging-ზე deploy (usectl). სატესტო მონაცემები: `node dist/scripts/seed-demo.js --yes`.
+- ⏭ შემდეგი: საჯარო `/v1/catalog/...` და `/v1/compatibility/...` (ფასეტები, თავსებადობის ფილტრი).
 - სამუშაოს დასრულებისას განაახლე `../icomers/PROJECT.md` (§1, §2, §7).

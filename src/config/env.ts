@@ -4,6 +4,12 @@ import { z } from 'zod';
  * ყველა env ცვლადი აქ აღიწერება და მოწმდება გაშვებისას.
  * არასწორი ან აკლია → აპი არ ეშვება და ლოგში ჩანს, რომელი ცვლადია პრობლემა.
  */
+/** ცარიელი სტრიქონი = არ არის მითითებული */
+const optionalString = z
+  .string()
+  .optional()
+  .transform((v) => (v?.trim() ? v.trim() : undefined));
+
 const envSchema = z.object({
   NODE_ENV: z
     .enum(['development', 'test', 'production'])
@@ -81,6 +87,22 @@ const envSchema = z.object({
     .enum(['true', 'false'])
     .optional()
     .transform((v) => (v === undefined ? undefined : v === 'true')),
+
+  // --- ფაილების საცავი (პროდუქტის სურათები) ---
+  // usectl-ის S3 addon ამ ცვლადებს თავად ამატებს. S3_ENDPOINT ცარიელია → ფაილები
+  // ლოკალურ დისკზე, STORAGE_LOCAL_DIR-ში (ლოკალური დეველოპმენტი, S3-ის გარეშე).
+  /** `host:port` (usectl: `external-s3...svc:8333`) ან სრული URL */
+  S3_ENDPOINT: optionalString,
+  S3_BUCKET: optionalString,
+  S3_ACCESS_KEY: optionalString,
+  S3_SECRET_KEY: optionalString,
+  S3_REGION: z.string().min(1).default('us-east-1'),
+  /** `S3_ENDPOINT`-ს სქემა თუ არ აქვს: true → https, false → http */
+  S3_USE_SSL: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((v) => v === 'true'),
+  STORAGE_LOCAL_DIR: z.string().min(1).default('.storage'),
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -98,6 +120,16 @@ export function validateEnv(raw: Record<string, unknown>): Env {
     throw new Error(
       'Invalid environment variables:\n  - JWT_PRIVATE_KEY: required in production',
     );
+  }
+  if (env.S3_ENDPOINT) {
+    const missing = (['S3_BUCKET', 'S3_ACCESS_KEY', 'S3_SECRET_KEY'] as const).filter(
+      (key) => !env[key],
+    );
+    if (missing.length) {
+      throw new Error(
+        `Invalid environment variables:\n${missing.map((k) => `  - ${k}: required when S3_ENDPOINT is set`).join('\n')}`,
+      );
+    }
   }
   return env;
 }

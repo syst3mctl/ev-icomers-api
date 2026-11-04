@@ -197,6 +197,12 @@ export class ProductImageResponse {
   @ApiProperty({ format: 'uuid' }) id!: string;
   @ApiProperty() storage_key!: string;
   @ApiProperty({
+    description:
+      'სურათის მისამართი API-ს ფესვიდან: `/v1/media/products/...`. ადმინკაში — `/api` + url',
+    example: '/v1/media/products/6f1c.../0b7e....webp',
+  })
+  url!: string;
+  @ApiProperty({
     type: 'object',
     additionalProperties: true,
     description: 'alt ტექსტი ენებად: `{ "ka": "...", "en": "..." }`',
@@ -222,6 +228,12 @@ export class ProductListItemResponse {
   compare_at_price_minor!: number | null;
   @ApiProperty() is_universal!: boolean;
   @ApiProperty() is_featured!: boolean;
+  @ApiProperty({
+    nullable: true,
+    type: String,
+    description: 'პირველი (მთავარი) სურათის `url`; სურათი არ აქვს → `null`',
+  })
+  image_url!: string | null;
   @ApiProperty({ format: 'date-time' }) created_at!: string;
   @ApiProperty({ format: 'date-time' }) updated_at!: string;
 }
@@ -257,4 +269,36 @@ export class ProductSummaryResponse {
   @ApiProperty({ enum: PRODUCT_STATUSES }) status!: ProductStatus;
   @ApiProperty({ description: 'სახელი `ka`-ზე (ან პირველი არსებული)' })
   name!: string;
+}
+
+export class ReorderProductImagesDto {
+  @ApiProperty({
+    type: [String],
+    format: 'uuid',
+    description: 'პროდუქტის **ყველა** სურათის id ახალი რიგით; პირველი — მთავარი სურათი',
+  })
+  @IsArray()
+  @IsUUID('all', { each: true })
+  image_ids!: string[];
+}
+
+export class UploadProductImageDto {
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: 'JPEG, PNG ან WebP, მაქსიმუმ 8 MB',
+  })
+  file!: unknown;
+
+  @ApiPropertyOptional({ type: String, maxLength: 300, description: 'alt ტექსტი ქართულად' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(300)
+  alt_ka?: string;
+
+  @ApiPropertyOptional({ type: String, maxLength: 300, description: 'alt ტექსტი ინგლისურად' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(300)
+  alt_en?: string;
 }

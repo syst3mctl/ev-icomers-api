@@ -868,6 +868,191 @@
         ]
       }
     },
+    "/v1/admin/products/{id}/images": {
+      "post": {
+        "description": "multipart/form-data, ველი `file` (JPEG / PNG / WebP, ≤ 8 MB). ემატება რიგის ბოლოს. შეცდომები: `413 IMAGE_TOO_LARGE`, `415 IMAGE_TYPE_NOT_SUPPORTED`, `409 TOO_MANY_IMAGES`.",
+        "operationId": "AdminProductImagesController_upload_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadProductImageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductImageResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "სურათის ატვირთვა",
+        "tags": [
+          "admin/catalog"
+        ]
+      }
+    },
+    "/v1/admin/products/{id}/images/order": {
+      "put": {
+        "operationId": "AdminProductImagesController_reorder_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderProductImagesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductImageResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "სურათების რიგის შეცვლა (პირველი — მთავარი)",
+        "tags": [
+          "admin/catalog"
+        ]
+      }
+    },
+    "/v1/admin/products/{id}/images/{image_id}": {
+      "delete": {
+        "operationId": "AdminProductImagesController_remove_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "image_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "სურათის წაშლა (ბაზიდანაც და საცავიდანაც)",
+        "tags": [
+          "admin/catalog"
+        ]
+      }
+    },
+    "/v1/media/products/{product_id}/{file}": {
+      "get": {
+        "operationId": "MediaController_productImage_v1",
+        "parameters": [
+          {
+            "name": "product_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "file",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "summary": "პროდუქტის სურათი",
+        "tags": [
+          "media"
+        ]
+      }
+    },
     "/v1/admin/charger-brands": {
       "get": {
         "operationId": "AdminChargerBrandsController_list_v1",
@@ -2309,6 +2494,11 @@
           "is_featured": {
             "type": "boolean"
           },
+          "image_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "პირველი (მთავარი) სურათის `url`; სურათი არ აქვს → `null`"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -2330,6 +2520,7 @@
           "compare_at_price_minor",
           "is_universal",
           "is_featured",
+          "image_url",
           "created_at",
           "updated_at"
         ]
@@ -2409,6 +2600,11 @@
           "storage_key": {
             "type": "string"
           },
+          "url": {
+            "type": "string",
+            "description": "სურათის მისამართი API-ს ფესვიდან: `/v1/media/products/...`. ადმინკაში — `/api` + url",
+            "example": "/v1/media/products/6f1c.../0b7e....webp"
+          },
           "alt": {
             "type": "object",
             "additionalProperties": true,
@@ -2429,6 +2625,7 @@
         "required": [
           "id",
           "storage_key",
+          "url",
           "alt",
           "sort_order",
           "width",
@@ -2480,6 +2677,11 @@
           "is_featured": {
             "type": "boolean"
           },
+          "image_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "პირველი (მთავარი) სურათის `url`; სურათი არ აქვს → `null`"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -2530,6 +2732,7 @@
           "compare_at_price_minor",
           "is_universal",
           "is_featured",
+          "image_url",
           "created_at",
           "updated_at",
           "vat_rate_bp",
@@ -2748,6 +2951,45 @@
             }
           }
         }
+      },
+      "UploadProductImageDto": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "JPEG, PNG ან WebP, მაქსიმუმ 8 MB"
+          },
+          "alt_ka": {
+            "type": "string",
+            "maxLength": 300,
+            "description": "alt ტექსტი ქართულად"
+          },
+          "alt_en": {
+            "type": "string",
+            "maxLength": 300,
+            "description": "alt ტექსტი ინგლისურად"
+          }
+        },
+        "required": [
+          "file"
+        ]
+      },
+      "ReorderProductImagesDto": {
+        "type": "object",
+        "properties": {
+          "image_ids": {
+            "description": "პროდუქტის **ყველა** სურათის id ახალი რიგით; პირველი — მთავარი სურათი",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "image_ids"
+        ]
       },
       "ChargerBrandResponse": {
         "type": "object",

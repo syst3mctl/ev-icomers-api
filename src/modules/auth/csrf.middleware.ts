@@ -29,6 +29,9 @@ function reject(res: Response, detail: string): void {
  *    (`Sec-Fetch-Site: cross-site | same-site`).
  * 2. body-იან მოთხოვნას ამ შემთხვევაში `Content-Type: application/json` სჭირდება —
  *    HTML ფორმა JSON-ს ვერ აგზავნის, სხვა origin-იდან `fetch` კი preflight-ს და CORS-ს გადის.
+ *    გამონაკლისი — ფაილის ატვირთვა (`multipart/form-data`): HTML ფორმასაც შეუძლია მისი
+ *    გაგზავნა, ამიტომ დამატებით სავალდებულოა `X-Requested-With` header. ფორმა header-ს ვერ
+ *    ამატებს, სხვა origin-ის `fetch`-ს კი ის preflight-ს აიძულებს (CORS უარყოფს).
  *
  * `Authorization: Bearer`-ით მოსული მოთხოვნა (cookie-ს გარეშე) ამას არ ეხება: ბრაუზერი
  * ბეარერ ტოკენს თავად არ ამატებს.
@@ -58,7 +61,16 @@ export function csrfProtection(
     Number(req.headers['content-length'] ?? 0) > 0 ||
     req.headers['transfer-encoding'] !== undefined;
   if (hasBody && !req.is('application/json')) {
-    return reject(res, 'საჭიროა Content-Type: application/json');
+    const isUpload =
+      req.is('multipart/form-data') && req.headers['x-requested-with'] !== undefined;
+    if (!isUpload) {
+      return reject(
+        res,
+        req.is('multipart/form-data')
+          ? 'ფაილის ატვირთვას სჭირდება X-Requested-With header'
+          : 'საჭიროა Content-Type: application/json',
+      );
+    }
   }
 
   next();

@@ -196,6 +196,25 @@ describe('Auth (e2e)', () => {
       expect(ok.status).toBe(201);
     });
 
+    it('ფაილის ატვირთვა (multipart) cookie-ით: X-Requested-With-ის გარეშე → 403, მისით — CSRF გადის', async () => {
+      const cookies = cookieHeader(cookiesFrom(await login()));
+      const url = '/v1/admin/users';
+      const withoutHeader = await http()
+        .post(url)
+        .set('Cookie', cookies)
+        .field('email', 'form@shop.ge');
+      expect(withoutHeader.status).toBe(403);
+      expect(withoutHeader.body.code).toBe('CSRF_REJECTED');
+
+      const withHeader = await http()
+        .post(url)
+        .set('Cookie', cookies)
+        .set('X-Requested-With', 'fetch')
+        .field('email', 'form@shop.ge');
+      // CSRF გაიარა; შემდეგ ვალიდაცია უარყოფს (ეს endpoint ფაილს არ ელოდება)
+      expect(withHeader.status).not.toBe(403);
+    });
+
     it('logout სხვა საიტიდან → 403 (იძულებითი გასვლა არ ხდება)', async () => {
       const cookies = cookieHeader(cookiesFrom(await login()));
       const res = await http()

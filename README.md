@@ -17,7 +17,7 @@ icomers ონლაინ მაღაზიის backend: **NestJS** (modular
 ```bash
 nvm use                       # Node 24
 cp .env.example .env
-docker compose up -d          # Postgres, NATS, Mailpit (MinIO დროებით გათიშულია — იხ. „ცნობილი პრობლემები“)
+docker compose up -d          # Postgres, NATS, Mailpit (სურათები ლოკალურად `.storage/`-ში — S3 არ სჭირდება)
 pnpm install                  # აგენერირებს Prisma client-საც
 
 pnpm db:migrate               # მიგრაციები უკვე რეპოშია — მხოლოდ გამოყენება
@@ -126,7 +126,21 @@ Swagger-ში: **Authorize** → `bearer` ველში access token.
 | `/v1/admin/charger-brands`, `/v1/admin/charger-models`, `/v1/admin/products/{id}/compatibility` | იგივე |
 | `/v1/admin/inventory/...` | `INVENTORY_ROLES`: `warehouse`, `manager`, `admin` |
 
+| `/v1/admin/products/{id}/images` (ატვირთვა, რიგი, წაშლა) | `CATALOG_EDITOR_ROLES` |
+| `GET /v1/media/products/{product_id}/{file}` | საჯარო (ავტორიზაციის გარეშე) |
+
 სრული სია: Swagger `/docs` ან `openapi.json`.
+
+**პროდუქტის სურათები.** ფაილი API-ზე იტვირთება: `POST /v1/admin/products/{id}/images`,
+`multipart/form-data`, ველი `file` (JPEG / PNG / WebP, ≤ 8 MB, ტიპი ფაილის შიგთავსით მოწმდება).
+presigned URL-ით პირდაპირ S3-ში ატვირთვა **არ** გამოდგება: usectl-ის S3 კლასტერის შიგნითაა
+(`S3_ENDPOINT=external-s3...svc:8333`) და ბრაუზერი მას ვერ ხედავს. იმავე მიზეზით სურათს
+`GET /v1/media/...` აბრუნებს (ქეში — 1 წელი, ფაილის სახელი uuid-ია და არ იცვლება).
+პასუხებში: `images[].url` და სიაში `image_url` — მისამართი API-ს ფესვიდან (`/v1/media/...`).
+საცავი (`src/infra/storage/`): **S3**, თუ `S3_ENDPOINT` მითითებულია (staging), თორემ **ლოკალური
+დისკი** — `STORAGE_LOCAL_DIR` (ნაგულისხმევად `.storage/`, git-ში არ არის). ლოკალურად S3 არ გვჭირდება.
+CSRF: cookie-იან `multipart` მოთხოვნას სჭირდება `X-Requested-With` header (HTML ფორმა მას ვერ
+აგზავნის) — ადმინკა მას `uploadProductImage()`-ში ამატებს.
 
 **მარაგი.** რაოდენობა პირდაპირ არ იწერება — მხოლოდ ცვლილებით
 (`POST /v1/admin/inventory/{product_id}/movements`), რომ ყველა ნაბიჯი `stock_movements`-ში
@@ -258,7 +272,7 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e
 | პრობლემა | მიზეზი და გამოსავალი |
 |---|---|
 | `pnpm install` ვარდება: *„Prisma only supports Node.js versions 20.19+, 22.12+, 24.0+“* | სისტემაში Homebrew-ის Node 23-ია. `nvm use` (რეპოში `.nvmrc`), ან სამუდამოდ `nvm alias default 24` |
-| `docker compose up -d` ვარდება: *„pull access denied for minio/minio“* | MinIO-ს community image-ები აღარ არის თავისუფლად ჩამოსატვირთი: `minio/minio` Docker Hub-ზე აღარ არსებობს, quay.io-ზე ავტორიზაციას ითხოვს. სერვისი დროებით კომენტარშია `docker-compose.yml`-ში. S3 ეტაპ 1-იდან დაგვჭირდება — მაშინ შეირჩევა ჩანაცვლება (localstack / seaweedfs / garage / adobe-s3mock) |
+| `docker compose up -d` ვარდება: *„pull access denied for minio/minio“* | MinIO-ს community image-ები აღარ არის თავისუფლად ჩამოსატვირთი, სერვისი კომენტარშია `docker-compose.yml`-ში. **ლოკალურად S3 აღარ გვჭირდება:** `S3_ENDPOINT` ცარიელია → სურათები `.storage/`-ში იწერება (იხ. „პროდუქტის სურათები“) |
 | macOS: *„You can't open the application Docker because it is not responding“* | Docker Desktop-ის GUI მოკვდა, backend პროცესები მიტოვებული დარჩა. გაასუფთავე და ხელახლა გაუშვი: `pkill -f 'Docker.app/Contents/MacOS'` → `open -a Docker` |
 | API `503 DATABASE_UNAVAILABLE`-ს აბრუნებს (ლოგში `ECONNREFUSED`) | Postgres არ მუშაობს. **Docker Desktop-ის გაშვება კონტეინერებს არ უშვებს** — საჭიროა `docker compose up -d` რეპოს ფოლდერიდან. შემოწმება: `docker compose ps` (სამი კონტეინერი `Up`) და `nc -zv localhost 5432`. API-ს გადატვირთვა არ სჭირდება — Prisma ახალ მოთხოვნაზე თავად დაუკავშირდება |
 | ტესტებში ადმინის endpoint-ი 401-ს აბრუნებს | ტოკენი არ არის. endpoint-ის ტესტირებისას guard გადაფარე `.overrideGuard(AdminGuard)`-ით (**არა** `overrideProvider`-ით — guard-ზე ის არ მოქმედებს). მაგალითი: `test/admin-catalog.e2e-spec.ts`. მთელი auth ნაკადი ბაზის გარეშე: `test/auth.e2e-spec.ts` (`test/support/fake-auth-prisma.ts`) |
@@ -306,7 +320,7 @@ worker-ისთვის (მომავალში): იგივე image, 
 | env | საიდან |
 |---|---|
 | `DATABASE_URL` | Postgres addon (pod-ზე **attach** უნდა იყოს) — ხელით არ იწერება |
-| `S3_*`, `AWS_*` | S3 addon (attach) |
+| `S3_*`, `AWS_*` | S3 addon (attach) — პროდუქტის სურათები. API იყენებს `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_REGION`, `S3_USE_SSL` |
 | `JWT_PRIVATE_KEY` | **საიდუმლო**, protected. `openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256` |
 | `SEED_SUPERADMIN_EMAIL` / `SEED_SUPERADMIN_PASSWORD` | პირველი superadmin. პაროლი — **საიდუმლო** |
 | `JWT_ISSUER`, `JWT_AUDIENCE` | `https://<ადმინკის დომენი>/api`, `icomers-admin` |

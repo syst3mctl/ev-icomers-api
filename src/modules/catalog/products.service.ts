@@ -9,6 +9,7 @@ import type {
   ListProductsQueryDto,
   ProductSort,
 } from './dto/list-products.query.dto.js';
+import { mediaUrl } from './media-url.js';
 import type {
   CreateProductDto,
   ProductListResponse,
@@ -429,6 +430,25 @@ function displayName(translations: { locale: string; name: string }[]): string {
   return preferred?.name ?? translations[0]?.name ?? '';
 }
 
+export function toImageResponse(img: {
+  id: string;
+  storage_key: string;
+  alt: unknown;
+  sort_order: number;
+  width: number | null;
+  height: number | null;
+}): ProductResponse['images'][number] {
+  return {
+    id: img.id,
+    storage_key: img.storage_key,
+    url: mediaUrl(img.storage_key),
+    alt: (img.alt ?? {}) as Record<string, unknown>,
+    sort_order: img.sort_order,
+    width: img.width,
+    height: img.height,
+  };
+}
+
 function toListItem(row: ProductRow): ProductListResponse['items'][number] {
   return {
     id: row.id,
@@ -442,6 +462,7 @@ function toListItem(row: ProductRow): ProductListResponse['items'][number] {
     compare_at_price_minor: row.compare_at_price_minor,
     is_universal: row.is_universal,
     is_featured: row.is_featured,
+    image_url: row.images[0] ? mediaUrl(row.images[0].storage_key) : null,
     created_at: row.created_at.toISOString(),
     updated_at: row.updated_at.toISOString(),
   };
@@ -462,13 +483,6 @@ function toProductResponse(row: ProductRow): ProductResponse {
       seo_title: t.seo_title,
       seo_description: t.seo_description,
     })),
-    images: row.images.map((img) => ({
-      id: img.id,
-      storage_key: img.storage_key,
-      alt: (img.alt ?? {}) as Record<string, unknown>,
-      sort_order: img.sort_order,
-      width: img.width,
-      height: img.height,
-    })),
+    images: row.images.map(toImageResponse),
   };
 }

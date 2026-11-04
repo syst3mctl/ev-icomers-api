@@ -1,6 +1,8 @@
 node_modules
 dist
 coverage
+# ლოკალური ფაილების საცავი (S3-ის ნაცვლად, STORAGE_LOCAL_DIR)
+.storage
 *.log
 .DS_Store
 
