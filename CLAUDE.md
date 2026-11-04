@@ -28,7 +28,7 @@ icomers ონლაინ მაღაზიის backend. **მთელი �
 ```bash
 nvm use                     # Node 24 — სისტემაში Node 23-ია, Prisma მას არ უშვებს
 docker compose up -d        # Postgres, NATS, Mailpit (სურათები ლოკალურად .storage/-ში)
-pnpm start:dev              # API → http://localhost:4000 (Swagger: /docs)
+pnpm start:dev              # API → http://localhost:4000 (Swagger: /swagger)
 pnpm start:worker           # Worker
 pnpm lint && pnpm typecheck
 pnpm test && pnpm test:e2e

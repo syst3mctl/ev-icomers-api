@@ -26,7 +26,7 @@ pnpm db:seed                  # სატესტო კატეგორი�
 pnpm start:dev                # API: http://localhost:4000
 ```
 
-- Swagger UI: http://localhost:4000/docs
+- Swagger UI: http://localhost:4000/swagger (`/docs` გადამისამართდება)
 - OpenAPI JSON: http://localhost:4000/docs-json
 - Health: http://localhost:4000/health/live, http://localhost:4000/health/ready
 - Prisma Studio (ბაზის დათვალიერება): `pnpm db:studio`
@@ -129,7 +129,7 @@ Swagger-ში: **Authorize** → `bearer` ველში access token.
 | `/v1/admin/products/{id}/images` (ატვირთვა, რიგი, წაშლა) | `CATALOG_EDITOR_ROLES` |
 | `GET /v1/media/products/{product_id}/{file}` | საჯარო (ავტორიზაციის გარეშე) |
 
-სრული სია: Swagger `/docs` ან `openapi.json`.
+სრული სია: Swagger `/swagger` ან `openapi.json`.
 
 **პროდუქტის სურათები.** ფაილი API-ზე იტვირთება: `POST /v1/admin/products/{id}/images`,
 `multipart/form-data`, ველი `file` (JPEG / PNG / WebP, ≤ 8 MB, ტიპი ფაილის შიგთავსით მოწმდება).
@@ -167,7 +167,7 @@ CSRF: cookie-იან `multipart` მოთხოვნას სჭირდ�
 `stock_status`: `IN_STOCK` / `LOW_STOCK` (`available <= low_stock_threshold`) / `OUT_OF_STOCK`, ზუსტი რიცხვი გარეთ არ გადის;
 `charger_model` / `charger_brand` — თავსებადი **და** უნივერსალური (`is_universal`) პროდუქტები.
 
-**Swagger-ის ძებნა** (`/docs`, ზედა ველი): ჯგუფის სახელი, მისამართი (`products/{slug}`), მეთოდი ან აღწერა;
+**Swagger-ის ძებნა** (`/swagger`, ზედა ველი): ჯგუფის სახელი, მისამართი (`products/{slug}`), მეთოდი ან აღწერა;
 რამდენიმე სიტყვა — ყველა უნდა ემთხვეოდეს (`GET brands`). ჯგუფები: `src/openapi-tags.ts` — ახალი controller-ი
 `@ApiTags(TAGS.…)`-ს იყენებს, არა ტექსტს.
 
@@ -201,7 +201,7 @@ pnpm start:dev
 
 ### 3. Swagger — მთავარი ინსტრუმენტი
 
-<http://localhost:4000/docs>
+<http://localhost:4000/swagger>
 
 ეს არის API-ს „ცოცხალი“ ინტერფეისი და ყველაზე მარტივი გზა, რომ ყველაფერი ხელით გასინჯო **კოდის დაწერის გარეშე**:
 
@@ -277,7 +277,7 @@ pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e
 
 ### გამოსადეგი წვრილმანები
 
-- **`404` ყველა endpoint-ზე** — სავარაუდოდ `/v1` დაგავიწყდა: `/v1/admin/products`, არა `/admin/products` (გამონაკლისი — `/health/*` და `/docs`)
+- **`404` ყველა endpoint-ზე** — სავარაუდოდ `/v1` დაგავიწყდა: `/v1/admin/products`, არა `/admin/products` (გამონაკლისი — `/health/*`, `/swagger`, `/docs-json`)
 - **ველი პასუხში არ ჩანს, თუმცა კოდში წერია** — response DTO-ში `@ApiProperty()` და `toXxxResponse()` ფუნქციაში ორივეში უნდა იყოს
 - **ტესტი მწვანეა, Swagger-ში არ მუშაობს** — სავარაუდოდ stub-ი რეალობას არ ემთხვევა. **მართალია Swagger**, და მაშინ stub უნდა გასწორდეს (ასეთი შემთხვევა უკვე გვქონდა)
 - **`401 TOKEN_INVALID` API-ს გადატვირთვის შემდეგ** — `.env`-ში `JWT_PRIVATE_KEY` ცარიელია, ყოველ გაშვებაზე ახალი გასაღები იქმნება. ჩაწერე მუდმივი გასაღები (`.env.example`-ში ბრძანებაა)
@@ -359,7 +359,7 @@ worker-ისთვის (მომავალში): იგივე image, 
 ლოკალურ ადმინკას staging-თან `npm run dev:staging` აკავშირებს (Vite proxy, იხ. `ev-icomers-admin/README.md`).
 CORS ძირითადად საჯარო, ლოგინის გარეშე endpoint-ებისთვისაა (storefront-ის კატალოგი).
 
-Swagger staging-ზე: https://icomers-admin.usectl.com/api/docs . პაროლის აღდგენა: pod → Terminal →
+Swagger staging-ზე: https://icomers-admin.usectl.com/api/swagger (Cloudflare-მა მისი ფაილები არ უნდა დაიმახსოვროს — API მათ `Cache-Control: no-store`-ით აბრუნებს; ძველი `/api/docs` გადამისამართდება). პაროლის აღდგენა: pod → Terminal →
 `node dist/scripts/set-admin-password.js <email>` (იხ. „ადმინის endpoint-ები და ავტორიზაცია“).
 
 **სატესტო მონაცემები staging-ზე** (იგივე, რაც ლოკალურად `pnpm db:seed`: 3 კატეგორია, დამტენის ბრენდები/მოდელები,

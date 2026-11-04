@@ -73,8 +73,40 @@ function searchPlugin() {
   };
 }
 
+/** Swagger UI-ის მისამართი. `/docs` → აქ გადამისამართდება (ძველი ბმულები) */
+export const SWAGGER_PATH = 'swagger';
+
 export function setupSwagger(app: INestApplication): void {
-  SwaggerModule.setup('docs', app, () => buildOpenApi(app), {
+  type Req = { path: string; originalUrl: string };
+  type Res = {
+    setHeader(name: string, value: string): void;
+    redirect(status: number, url: string): void;
+  };
+
+  // Swagger-ის გვერდი API-სთან ერთად იცვლება — Cloudflare-მა და ბრაუზერმა არ უნდა დაიმახსოვრონ
+  // (`swagger-ui-init.js`-ში აღწერა ჩაშენებულია და ქეშიდან ძველ ვერსიას აჩვენებდა).
+  app.use((req: Req, res: Res, next: () => void) => {
+    if (
+      req.path === `/${SWAGGER_PATH}` ||
+      req.path.startsWith(`/${SWAGGER_PATH}/`) ||
+      req.path === '/docs-json'
+    ) {
+      res.setHeader('Cache-Control', 'no-store');
+    }
+    next();
+  });
+  // ძველი მისამართი. ფარდობითი გადამისამართება — ადმინკის nginx-ის `/api` პრეფიქსი შენარჩუნდება
+  app.use('/docs', (req: Req, res: Res, next: () => void) => {
+    if (req.path !== '/') return next();
+    res.redirect(
+      302,
+      req.originalUrl.split('?')[0]!.endsWith('/')
+        ? `../${SWAGGER_PATH}`
+        : SWAGGER_PATH,
+    );
+  });
+
+  SwaggerModule.setup(SWAGGER_PATH, app, () => buildOpenApi(app), {
     jsonDocumentUrl: 'docs-json',
     customSiteTitle: 'icomers API',
     swaggerOptions: {
