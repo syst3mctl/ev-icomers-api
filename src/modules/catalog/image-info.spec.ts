@@ -20,12 +20,19 @@ describe('readImageInfo', () => {
     ['webp (lossless)', WEBP_LOSSLESS, 'webp', 'image/webp'],
   ])('%s → ტიპი და ზომა 3×2', (_, data, ext, contentType) => {
     const info = readImageInfo(b64(data));
-    expect(info).toMatchObject({ ext, content_type: contentType, width: 3, height: 2 });
+    expect(info).toMatchObject({
+      ext,
+      content_type: contentType,
+      width: 3,
+      height: 2,
+    });
   });
 
   it('სხვა ფაილი (მაგ. PDF ან ტექსტი) → null', () => {
     expect(readImageInfo(Buffer.from('%PDF-1.7 ...'))).toBeNull();
-    expect(readImageInfo(Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"/>'))).toBeNull();
+    expect(
+      readImageInfo(Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"/>')),
+    ).toBeNull();
     expect(readImageInfo(Buffer.alloc(0))).toBeNull();
   });
 });

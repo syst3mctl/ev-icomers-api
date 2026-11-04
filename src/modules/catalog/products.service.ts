@@ -131,7 +131,11 @@ export class ProductsService {
       include: PRODUCT_INCLUDE,
     });
     if (!row) {
-      throw new AppError(404, 'PRODUCT_NOT_FOUND', `პროდუქტი ${id} ვერ მოიძებნა`);
+      throw new AppError(
+        404,
+        'PRODUCT_NOT_FOUND',
+        `პროდუქტი ${id} ვერ მოიძებნა`,
+      );
     }
     return toProductResponse(row);
   }
@@ -174,7 +178,11 @@ export class ProductsService {
       select: { price_minor: true, compare_at_price_minor: true },
     });
     if (!current) {
-      throw new AppError(404, 'PRODUCT_NOT_FOUND', `პროდუქტი ${id} ვერ მოიძებნა`);
+      throw new AppError(
+        404,
+        'PRODUCT_NOT_FOUND',
+        `პროდუქტი ${id} ვერ მოიძებნა`,
+      );
     }
 
     if (dto.translations) requireDefaultLocale(dto.translations);
@@ -241,10 +249,18 @@ export class ProductsService {
       select: { status: true },
     });
     if (!row) {
-      throw new AppError(404, 'PRODUCT_NOT_FOUND', `პროდუქტი ${id} ვერ მოიძებნა`);
+      throw new AppError(
+        404,
+        'PRODUCT_NOT_FOUND',
+        `პროდუქტი ${id} ვერ მოიძებნა`,
+      );
     }
     if (row.status === ProductStatus.ARCHIVED) {
-      throw new AppError(409, 'PRODUCT_ALREADY_ARCHIVED', 'პროდუქტი უკვე არქივშია');
+      throw new AppError(
+        409,
+        'PRODUCT_ALREADY_ARCHIVED',
+        'პროდუქტი უკვე არქივშია',
+      );
     }
 
     const updated = await this.prisma.product.update({
@@ -267,7 +283,11 @@ export class ProductsService {
       select: { id: true },
     });
     if (!found) {
-      throw new AppError(404, 'PRODUCT_NOT_FOUND', `პროდუქტი ${id} ვერ მოიძებნა`);
+      throw new AppError(
+        404,
+        'PRODUCT_NOT_FOUND',
+        `პროდუქტი ${id} ვერ მოიძებნა`,
+      );
     }
   }
 
@@ -329,7 +349,11 @@ export class ProductsService {
       select: { is_universal: true },
     });
     if (!row) {
-      throw new AppError(404, 'PRODUCT_NOT_FOUND', `პროდუქტი ${id} ვერ მოიძებნა`);
+      throw new AppError(
+        404,
+        'PRODUCT_NOT_FOUND',
+        `პროდუქტი ${id} ვერ მოიძებნა`,
+      );
     }
     return row.is_universal;
   }
@@ -374,7 +398,11 @@ export class ProductsService {
         `slug "${slug}" უკვე გამოყენებულია`,
       );
     }
-    return new AppError(409, 'PRODUCT_SKU_TAKEN', `SKU "${sku}" უკვე გამოყენებულია`);
+    return new AppError(
+      409,
+      'PRODUCT_SKU_TAKEN',
+      `SKU "${sku}" უკვე გამოყენებულია`,
+    );
   }
 }
 

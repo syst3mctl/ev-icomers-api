@@ -146,5 +146,7 @@ export class StorageService {
 }
 
 function contentTypeFor(key: string): string {
-  return CONTENT_TYPES[extname(key).toLowerCase()] ?? 'application/octet-stream';
+  return (
+    CONTENT_TYPES[extname(key).toLowerCase()] ?? 'application/octet-stream'
+  );
 }

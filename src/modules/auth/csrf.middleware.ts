@@ -62,7 +62,8 @@ export function csrfProtection(
     req.headers['transfer-encoding'] !== undefined;
   if (hasBody && !req.is('application/json')) {
     const isUpload =
-      req.is('multipart/form-data') && req.headers['x-requested-with'] !== undefined;
+      req.is('multipart/form-data') &&
+      req.headers['x-requested-with'] !== undefined;
     if (!isUpload) {
       return reject(
         res,

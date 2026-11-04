@@ -122,9 +122,9 @@ export function validateEnv(raw: Record<string, unknown>): Env {
     );
   }
   if (env.S3_ENDPOINT) {
-    const missing = (['S3_BUCKET', 'S3_ACCESS_KEY', 'S3_SECRET_KEY'] as const).filter(
-      (key) => !env[key],
-    );
+    const missing = (
+      ['S3_BUCKET', 'S3_ACCESS_KEY', 'S3_SECRET_KEY'] as const
+    ).filter((key) => !env[key]);
     if (missing.length) {
       throw new Error(
         `Invalid environment variables:\n${missing.map((k) => `  - ${k}: required when S3_ENDPOINT is set`).join('\n')}`,

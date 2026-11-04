@@ -1,8 +1,4 @@
-import {
-  ApiProperty,
-  ApiPropertyOptional,
-  PartialType,
-} from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
@@ -275,7 +271,8 @@ export class ReorderProductImagesDto {
   @ApiProperty({
     type: [String],
     format: 'uuid',
-    description: 'პროდუქტის **ყველა** სურათის id ახალი რიგით; პირველი — მთავარი სურათი',
+    description:
+      'პროდუქტის **ყველა** სურათის id ახალი რიგით; პირველი — მთავარი სურათი',
   })
   @IsArray()
   @IsUUID('all', { each: true })
@@ -290,13 +287,21 @@ export class UploadProductImageDto {
   })
   file!: unknown;
 
-  @ApiPropertyOptional({ type: String, maxLength: 300, description: 'alt ტექსტი ქართულად' })
+  @ApiPropertyOptional({
+    type: String,
+    maxLength: 300,
+    description: 'alt ტექსტი ქართულად',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(300)
   alt_ka?: string;
 
-  @ApiPropertyOptional({ type: String, maxLength: 300, description: 'alt ტექსტი ინგლისურად' })
+  @ApiPropertyOptional({
+    type: String,
+    maxLength: 300,
+    description: 'alt ტექსტი ინგლისურად',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(300)

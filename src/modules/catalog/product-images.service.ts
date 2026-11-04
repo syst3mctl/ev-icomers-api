@@ -49,11 +49,19 @@ export class ProductImagesService {
       select: {
         id: true,
         _count: { select: { images: true } },
-        images: { select: { sort_order: true }, orderBy: { sort_order: 'desc' }, take: 1 },
+        images: {
+          select: { sort_order: true },
+          orderBy: { sort_order: 'desc' },
+          take: 1,
+        },
       },
     });
     if (!product) {
-      throw new AppError(404, 'PRODUCT_NOT_FOUND', `პროდუქტი ${productId} ვერ მოიძებნა`);
+      throw new AppError(
+        404,
+        'PRODUCT_NOT_FOUND',
+        `პროდუქტი ${productId} ვერ მოიძებნა`,
+      );
     }
     if (product._count.images >= MAX_IMAGES_PER_PRODUCT) {
       throw new AppError(
@@ -90,22 +98,35 @@ export class ProductImagesService {
       select: { id: true, storage_key: true },
     });
     if (!image) {
-      throw new AppError(404, 'IMAGE_NOT_FOUND', `სურათი ${imageId} ვერ მოიძებნა`);
+      throw new AppError(
+        404,
+        'IMAGE_NOT_FOUND',
+        `სურათი ${imageId} ვერ მოიძებნა`,
+      );
     }
     await this.prisma.productImage.delete({ where: { id: image.id } });
     await this.storage.delete(image.storage_key);
   }
 
   /** ახალი რიგი; `imageIds` უნდა შეიცავდეს პროდუქტის ყველა სურათს, თითოს ერთხელ */
-  async reorder(productId: string, imageIds: string[]): Promise<ProductImageResponse[]> {
+  async reorder(
+    productId: string,
+    imageIds: string[],
+  ): Promise<ProductImageResponse[]> {
     const images = await this.prisma.productImage.findMany({
       where: { product_id: productId },
       select: { id: true },
     });
     if (images.length === 0) {
-      const exists = await this.prisma.product.count({ where: { id: productId } });
+      const exists = await this.prisma.product.count({
+        where: { id: productId },
+      });
       if (!exists) {
-        throw new AppError(404, 'PRODUCT_NOT_FOUND', `პროდუქტი ${productId} ვერ მოიძებნა`);
+        throw new AppError(
+          404,
+          'PRODUCT_NOT_FOUND',
+          `პროდუქტი ${productId} ვერ მოიძებნა`,
+        );
       }
     }
     const current = new Set(images.map((i) => i.id));
@@ -124,7 +145,10 @@ export class ProductImagesService {
 
     await this.prisma.$transaction(
       imageIds.map((id, index) =>
-        this.prisma.productImage.update({ where: { id }, data: { sort_order: index } }),
+        this.prisma.productImage.update({
+          where: { id },
+          data: { sort_order: index },
+        }),
       ),
     );
     const rows = await this.prisma.productImage.findMany({

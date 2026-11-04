@@ -22,7 +22,12 @@ export function readImageInfo(buf: Buffer): ImageInfo | null {
       height: buf.readUInt32BE(20),
     };
   }
-  if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) {
+  if (
+    buf.length >= 3 &&
+    buf[0] === 0xff &&
+    buf[1] === 0xd8 &&
+    buf[2] === 0xff
+  ) {
     const size = jpegSize(buf);
     return {
       type: 'jpeg',

@@ -15,7 +15,11 @@ export async function seedDemoData(prisma: PrismaClient): Promise<void> {
     { slug: 'connectors', ka: 'კონექტორები', en: 'Connectors' },
     { slug: 'accessories', ka: 'აქსესუარები', en: 'Accessories' },
     { slug: 'adapters', ka: 'ადაპტერები', en: 'Adapters' },
-    { slug: 'protection', ka: 'დაცვა და ელექტროობა', en: 'Protection & electrical' },
+    {
+      slug: 'protection',
+      ka: 'დაცვა და ელექტროობა',
+      en: 'Protection & electrical',
+    },
   ];
   const categoryIds: Record<string, string> = {};
   for (const [i, c] of categories.entries()) {
@@ -259,7 +263,13 @@ export async function seedDemoData(prisma: PrismaClient): Promise<void> {
         inventory: { create: { on_hand: p.on_hand } },
         movements:
           p.on_hand > 0
-            ? { create: { type: 'RECEIPT', quantity: p.on_hand, reason: 'seed' } }
+            ? {
+                create: {
+                  type: 'RECEIPT',
+                  quantity: p.on_hand,
+                  reason: 'seed',
+                },
+              }
             : undefined,
       },
     });
