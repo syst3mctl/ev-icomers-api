@@ -89,6 +89,17 @@ curl -s localhost:4000/v1/admin/categories           # seed-ის კატე�
 პირველი superadmin: `.env`-ში `SEED_SUPERADMIN_EMAIL` / `SEED_SUPERADMIN_PASSWORD`, შემდეგ `pnpm db:seed`.
 თუ მომხმარებელი უკვე არსებობს, seed პაროლს **არ ცვლის**.
 
+**პაროლის შეცვლა:** ჩვეულებრივ — ადმინკაში (მომხმარებლის მენიუ → „პაროლის შეცვლა“; სხვისი — „მომხმარებლები“).
+თუ შესვლა აღარ შეგიძლია (დაგავიწყდა, ანგარიში ჩაიკეტა) — პირდაპირ ბაზაში:
+
+```bash
+pnpm admin:password superadmin@example.com                                 # ლოკალურად (პაროლს გკითხავს)
+node dist/scripts/set-admin-password.js superadmin@example.com             # usectl: icomers-api → Terminal
+```
+
+ცვლის ჰეშს, ხსნის ჩაკეტვას და აუქმებს ამ მომხმარებლის ყველა სესიას. `SEED_SUPERADMIN_PASSWORD`-ის შეცვლა env-ში
+პაროლს **არ** ცვლის — ის მხოლოდ პირველად შექმნისას გამოიყენება.
+
 ```bash
 # ტოკენი (OAuth 2.0)
 curl -s -d grant_type=password -d username=superadmin@example.com -d password='...' \

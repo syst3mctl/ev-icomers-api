@@ -26,6 +26,7 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
+    "admin:password": "tsx src/scripts/set-admin-password.ts",
     "openapi:export": "nest build && node dist/scripts/export-openapi.js",
     "postinstall": "prisma generate"
   },

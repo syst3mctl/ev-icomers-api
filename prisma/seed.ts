@@ -151,3 +151,9 @@ async function main(): Promise<void> {
 
   console.log('Seed completed');
 }
+
+try {
+  await main();
+} finally {
+  await prisma.$disconnect();
+}
